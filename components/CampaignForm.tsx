@@ -102,7 +102,7 @@ export default function CampaignForm() {
             <div className="field">
               <label>Layanan Prioritas</label>
               <input type="text" value="Facial Treatment" readOnly />
-              <p className="hint">Terkunci pada Facial Treatment untuk MVP ini.</p>
+              <p className="hint">Terkunci pada Facial Treatment untuk versi awal aplikasi ini.</p>
             </div>
             <div className="field">
               <label>Platform Utama</label>
@@ -142,7 +142,7 @@ export default function CampaignForm() {
       </section>
       <section>
         <Note icon="💬">
-          Phase 1 tidak menyertakan field iklan berbayar maupun lead tracking.
+          Versi ini hanya untuk konten organik. Iklan berbayar tidak termasuk.
           Layanan prioritas dikunci pada <strong>Facial Treatment</strong>.
         </Note>
       </section>

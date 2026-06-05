@@ -87,8 +87,8 @@ export const REQUIRED_FIELDS: Array<keyof BrandSnapshot> = [
 
 export const BRAND_FIELDS: BrandField[] = [
   { key: 'businessName', label: 'Nama Bisnis', hint: 'Nama salon yang tampil di konten.', req: true },
-  { key: 'instagramHandle', label: 'Instagram Handle', hint: 'Contoh: @denanavbeauty (opsional).' },
-  { key: 'area', label: 'Area Target', hint: 'Wilayah utama yang ingin dijangkau.', req: true },
+  { key: 'instagramHandle', label: 'Username Instagram', hint: 'Contoh: @denanavbeauty (opsional).' },
+  { key: 'area', label: 'Kota / Wilayah Layanan', hint: 'Kota atau wilayah tempat salonmu melayani pelanggan.', req: true },
   { key: 'niche', label: 'Niche / Fokus Layanan', hint: 'Fokus utama layananmu dalam satu kalimat. Contoh: Klinik facial premium untuk perempuan aktif.', type: 'textarea' },
   { key: 'targetAudience', label: 'Target Pelanggan', hint: 'Siapa calon pelangganmu. Contoh: Wanita 20–35 tahun di Kota Bima yang peduli perawatan wajah.', type: 'textarea' },
   { key: 'mainService', label: 'Layanan Utama', hint: 'Untuk MVP ini hanya Facial Treatment.', req: true },
@@ -100,7 +100,7 @@ export const BRAND_FIELDS: BrandField[] = [
   { key: 'websiteLink', label: 'Website', hint: 'Link website jika tersedia (opsional).' },
   { key: 'primaryColor', label: 'Warna Utama', hint: 'Warna brand utama.' },
   { key: 'secondaryColor', label: 'Warna Sekunder', hint: 'Warna aksen brand.' },
-  { key: 'visualStyle', label: 'Gaya Visual', hint: 'Mood visual konten.', req: true },
+  { key: 'visualStyle', label: 'Gaya Visual', hint: 'Tampilan konten yang ingin ditampilkan. Contoh: bersih dan minimalis, hangat dan elegan, natural.', req: true },
   { key: 'toneOfVoice', label: 'Gaya Bahasa (Tone of Voice)', hint: 'Cara kamu menyapa pelanggan di konten. Contoh: hangat, profesional, informatif, tidak menggurui.', type: 'textarea' },
   { key: 'tagline', label: 'Tagline', hint: 'Kalimat singkat khas brand.' },
   { key: 'platforms', label: 'Platform', hint: 'Platform sosial media yang dipakai.' },
@@ -250,4 +250,9 @@ export const HASHTAG_BANK: string[] = [
   '#TotokWajah',
   '#FacialKotaBima',
   '#KulitFresh',
+  '#perawatanwajah',
+  '#glowingskin',
+  '#kulitsehat',
+  '#kecantikan',
+  '#facialmurah',
 ];

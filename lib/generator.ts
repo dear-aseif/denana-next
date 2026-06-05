@@ -223,7 +223,7 @@ export function generateDetail(
     row.cta,
   ];
 
-  let tags = HASHTAG_BANK.slice(0, 6);
+  let tags = HASHTAG_BANK.slice(0, 10);
   if (pillar === 'Promo & Booking Awareness')
     tags = [
       '#DenanavBeautySalon',
@@ -232,6 +232,10 @@ export function generateDetail(
       '#FacialTreatment',
       '#FacialKotaBima',
       '#PerawatanWajah',
+      '#glowingskin',
+      '#kulitsehat',
+      '#kecantikan',
+      '#facialmurah',
     ];
   if (pillar === 'Treatment Experience')
     tags = [
@@ -241,6 +245,10 @@ export function generateDetail(
       '#Microdermabrasion',
       '#TotokWajah',
       '#FacialBima',
+      '#glowingskin',
+      '#kulitsehat',
+      '#PerawatanWajah',
+      '#perawatanwajah',
     ];
 
   const checklist = [

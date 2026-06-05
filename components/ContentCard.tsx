@@ -11,6 +11,7 @@ import type { ContentRow } from '@/types/content';
 import { FORMATS, OBJECTIVES, PILLARS, STATUSES, pillarShort } from '@/data/sampleContent';
 import { fmtDate } from '@/lib/utils';
 import Button from './Button';
+import { useToast } from './ToastProvider';
 
 const hookStyle: React.CSSProperties = {
   color: 'var(--notion-text-soft)',
@@ -59,6 +60,13 @@ export default function ContentCard({
 }) {
   const sc = pillarShort(row.pillar);
   const detailLabel = hasDraft ? '📝 Ada Draft' : '✍️ Buat Caption';
+  const toast = useToast();
+
+  /* Show a brief confirmation for dropdown-only changes (not textarea keystrokes). */
+  function onSelectChange(key: keyof ContentRow, value: string) {
+    onField(row.id, key, value);
+    toast('Perubahan tersimpan');
+  }
 
   return (
     <tr data-id={row.id}>
@@ -70,7 +78,7 @@ export default function ContentCard({
         <SelectCell
           value={String(row.format)}
           options={FORMATS}
-          onChange={(v) => onField(row.id, 'format', v)}
+          onChange={(v) => onSelectChange('format', v)}
         />
       </td>
       <td>
@@ -79,7 +87,7 @@ export default function ContentCard({
           value={String(row.pillar)}
           options={PILLARS}
           style={pillarSelectStyle}
-          onChange={(v) => onField(row.id, 'pillar', v)}
+          onChange={(v) => onSelectChange('pillar', v)}
         />
       </td>
       <td>
@@ -111,14 +119,14 @@ export default function ContentCard({
         <SelectCell
           value={String(row.objective)}
           options={OBJECTIVES}
-          onChange={(v) => onField(row.id, 'objective', v)}
+          onChange={(v) => onSelectChange('objective', v)}
         />
       </td>
       <td>
         <SelectCell
           value={String(row.productionStatus)}
           options={STATUSES}
-          onChange={(v) => onField(row.id, 'productionStatus', v)}
+          onChange={(v) => onSelectChange('productionStatus', v)}
         />
       </td>
       <td>
@@ -127,7 +135,7 @@ export default function ContentCard({
             {detailLabel}
           </Button>
           <Button variant="ghost" size="tiny" onClick={() => onCopy(row.id)}>
-            Copy
+            📋 Salin
           </Button>
         </div>
       </td>

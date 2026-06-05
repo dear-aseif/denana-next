@@ -197,7 +197,7 @@ export default function DetailModal({
                 <div className="script-step" key={i}>
                   <div className="t">{s.time}</div>
                   <div>
-                    <div className="vo">{s.voiceover}</div>
+                    <div className="vo">🎤 {s.voiceover}</div>
                     <div className="ov">🎬 {s.visual}</div>
                     <div className="ov">📝 Overlay: {s.overlayText}</div>
                   </div>

@@ -59,9 +59,15 @@ export default function BrandForm() {
   }
 
   function handleReset() {
+    if (
+      !window.confirm(
+        'Semua data di form akan dikembalikan ke contoh awal. Lanjutkan?',
+      )
+    )
+      return;
     setValues({ ...defaultBrandSnapshot });
     setInvalid({});
-    toast('Form dikembalikan ke default');
+    toast('Form dikembalikan ke contoh awal.');
   }
 
   if (!mounted) return null;

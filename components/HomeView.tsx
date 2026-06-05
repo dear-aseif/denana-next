@@ -52,7 +52,6 @@ export default function HomeView() {
   return (
     <>
       <section className="page-head">
-        <span className="notion-eyebrow">Phase 1 · Organic Foundation</span>
         <h1>Denana Social Growth OS</h1>
         <p>
           Sistem sederhana untuk merencanakan dan mengelola konten sosial media
