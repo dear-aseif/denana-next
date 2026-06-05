@@ -122,3 +122,67 @@ export interface PillarPlanEntry {
   pillar: Pillar;
   count: number;
 }
+
+/* ---------- Series Bible (Module 1.1 — Brand DNA) ---------- */
+
+/** A single content pillar expanded for the Series Bible. */
+export interface SeriesBiblePillar {
+  name: string;
+  goal: string;
+  description: string;
+  exampleAngles: string[];
+}
+
+/** Representative audience persona with pain points. */
+export interface AudiencePersona {
+  name: string;
+  snapshot: string;
+  goals: string[];
+  painPoints: string[];
+}
+
+/** Visual identity guidance. */
+export interface VisualDNA {
+  primaryColor: string;
+  secondaryColor: string;
+  style: string;
+  moodKeywords: string[];
+  dos: string[];
+  donts: string[];
+}
+
+/** Reusable caption structure + guardrails. */
+export interface CaptionFramework {
+  structure: string[];
+  dos: string[];
+  donts: string[];
+}
+
+export interface PillarRatioEntry {
+  pillar: string;
+  count: number;
+  pct: string;
+}
+
+export interface PostingStrategy {
+  cadence: string;
+  formatMix: string[];
+  pillarRatio: PillarRatioEntry[];
+  tips: string[];
+}
+
+/** The full generated Series Bible, derived from the Brand Snapshot. */
+export interface SeriesBible {
+  generatedAt: string;
+  businessName: string;
+  tagline: string;
+  manifesto: string;
+  positioning: string;
+  toneOfVoice: string;
+  persona: AudiencePersona;
+  visual: VisualDNA;
+  caption: CaptionFramework;
+  pillars: SeriesBiblePillar[];
+  postingStrategy: PostingStrategy;
+  hashtags: string[];
+}

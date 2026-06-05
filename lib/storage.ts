@@ -8,7 +8,14 @@
  * without changing the calling components.
  */
 import { STORAGE_KEYS } from '@/data/sampleContent';
-import type { BrandSnapshot, Campaign, ContentRow, ContentDraft, DraftMap } from '@/types/content';
+import type {
+  BrandSnapshot,
+  Campaign,
+  ContentRow,
+  ContentDraft,
+  DraftMap,
+  SeriesBible,
+} from '@/types/content';
 
 function isBrowser(): boolean {
   return typeof window !== 'undefined' && !!window.localStorage;
@@ -56,6 +63,14 @@ export function saveCalendar(rows: ContentRow[]): boolean {
   return save(STORAGE_KEYS.contentCalendar, rows);
 }
 
+/* ---------- Series Bible (Module 1.1) ---------- */
+export function getSeriesBible(): SeriesBible | null {
+  return load<SeriesBible | null>(STORAGE_KEYS.seriesBible, null);
+}
+export function saveSeriesBible(data: SeriesBible): boolean {
+  return save(STORAGE_KEYS.seriesBible, data);
+}
+
 /* ---------- Drafts ---------- */
 export function getDrafts(): DraftMap {
   return load<DraftMap>(STORAGE_KEYS.contentDrafts, {}) || {};
@@ -84,6 +99,7 @@ export function resetAllLocalData(): void {
     STORAGE_KEYS.campaign,
     STORAGE_KEYS.contentCalendar,
     STORAGE_KEYS.contentDrafts,
+    STORAGE_KEYS.seriesBible,
   ].forEach((k) => {
     try {
       window.localStorage.removeItem(k);

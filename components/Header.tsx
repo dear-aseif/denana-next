@@ -16,6 +16,7 @@ type NavItem = { route: string; href: string; label: string };
 const NAV: NavItem[] = [
   { route: 'home', href: '/', label: 'Home' },
   { route: 'brand-setup', href: '/brand-setup', label: 'Profil Brand' },
+  { route: 'series-bible', href: '/series-bible', label: 'Series Bible' },
   { route: 'campaign-setup', href: '/campaign-setup', label: 'Rencana Campaign' },
   { route: 'content-calendar', href: '/content-calendar', label: 'Rencana Konten' },
 ];

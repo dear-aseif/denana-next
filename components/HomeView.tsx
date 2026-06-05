@@ -7,8 +7,8 @@
  * quick-steps card, and the scope note.
  */
 import React, { useEffect, useState } from 'react';
-import type { BrandSnapshot, Campaign, ContentRow } from '@/types/content';
-import { getBrand, getCampaign, getCalendar } from '@/lib/storage';
+import type { BrandSnapshot, Campaign, ContentRow, SeriesBible } from '@/types/content';
+import { getBrand, getCampaign, getCalendar, getSeriesBible } from '@/lib/storage';
 import Button from './Button';
 import Note from './Note';
 import Footer from './Footer';
@@ -23,17 +23,20 @@ export default function HomeView() {
   const [brand, setBrand] = useState<BrandSnapshot | null>(null);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [calendar, setCalendar] = useState<ContentRow[]>([]);
+  const [bible, setBible] = useState<SeriesBible | null>(null);
 
   useEffect(() => {
     setBrand(getBrand());
     setCampaign(getCampaign());
     setCalendar(getCalendar());
+    setBible(getSeriesBible());
     setMounted(true);
   }, []);
 
   if (!mounted) return null;
 
   const hasBrand = !!brand;
+  const hasBible = !!bible;
   const hasCampaign = !!campaign;
   const hasCalendar = calendar.length > 0;
 
@@ -76,6 +79,15 @@ export default function HomeView() {
             href="/brand-setup"
           />
           <StatusCard
+            icon="📖"
+            title="Series Bible"
+            tone={hasBible ? 'ok' : 'warn'}
+            pill={hasBible ? 'Tersimpan' : 'Belum dibuat'}
+            desc="Manifesto, persona, visual DNA, caption framework, dan posting strategy."
+            btn={hasBible ? 'Buka Series Bible' : 'Buat Series Bible'}
+            href="/series-bible"
+          />
+          <StatusCard
             icon="📅"
             title="Rencana Campaign"
             tone={hasCampaign ? 'ok' : 'warn'}
@@ -105,11 +117,15 @@ export default function HomeView() {
               facial sudah benar. <Button href="/brand-setup" variant="ghost" size="tiny">Buka</Button>
             </li>
             <li>
-              <strong>2. Rencana Campaign</strong> — atur periode dan tujuan
+              <strong>2. Series Bible</strong> — susun fondasi brand (manifesto,
+              persona, visual, caption). <Button href="/series-bible" variant="ghost" size="tiny">Buka</Button>
+            </li>
+            <li>
+              <strong>3. Rencana Campaign</strong> — atur periode dan tujuan
               awareness. <Button href="/campaign-setup" variant="ghost" size="tiny">Buka</Button>
             </li>
             <li>
-              <strong>3. Rencana Konten</strong> — buat 30 konten lalu susun caption
+              <strong>4. Rencana Konten</strong> — buat 30 konten lalu susun caption
               &amp; script. <Button href="/content-calendar" variant="ghost" size="tiny">Buka</Button>
             </li>
           </ol>
