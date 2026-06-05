@@ -16,6 +16,7 @@ import type {
   DraftMap,
   SeriesBible,
   CompetitorEntry,
+  KolEntry,
 } from '@/types/content';
 
 function isBrowser(): boolean {
@@ -80,6 +81,14 @@ export function saveCompetitors(rows: CompetitorEntry[]): boolean {
   return save(STORAGE_KEYS.competitorAudit, rows);
 }
 
+/* ---------- KOL / UGC Brief (Module 1.2C) ---------- */
+export function getKols(): KolEntry[] {
+  return load<KolEntry[]>(STORAGE_KEYS.kolBrief, []);
+}
+export function saveKols(rows: KolEntry[]): boolean {
+  return save(STORAGE_KEYS.kolBrief, rows);
+}
+
 /* ---------- Drafts ---------- */
 export function getDrafts(): DraftMap {
   return load<DraftMap>(STORAGE_KEYS.contentDrafts, {}) || {};
@@ -110,6 +119,7 @@ export function resetAllLocalData(): void {
     STORAGE_KEYS.contentDrafts,
     STORAGE_KEYS.seriesBible,
     STORAGE_KEYS.competitorAudit,
+    STORAGE_KEYS.kolBrief,
   ].forEach((k) => {
     try {
       window.localStorage.removeItem(k);

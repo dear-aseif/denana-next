@@ -217,3 +217,31 @@ export interface CompetitorEntry {
   weaknesses: string;
   opportunities: string;
 }
+
+/* ---------- KOL / UGC Brief (Module 1.2C) ---------- */
+
+/** The generated KOL / UGC collaboration brief, derived from the Brand Snapshot. */
+export interface KolBrief {
+  generatedAt: string;
+  businessName: string;
+  campaignGoal: string;
+  coreMessage: string;
+  audience: string;
+  mustMention: string[];
+  contentAngles: string[];
+  dos: string[];
+  donts: string[];
+  deliverables: string[];
+  hashtags: string[];
+}
+
+/** A single KOL / creator entry, filled in manually by the user. */
+export interface KolEntry {
+  id: string;
+  name: string;
+  platform: string;
+  followers: string;
+  contentType: string;
+  status: string;
+  notes: string;
+}

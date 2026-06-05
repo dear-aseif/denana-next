@@ -7,8 +7,8 @@
  * quick-steps card, and the scope note.
  */
 import React, { useEffect, useState } from 'react';
-import type { BrandSnapshot, Campaign, ContentRow, SeriesBible, CompetitorEntry } from '@/types/content';
-import { getBrand, getCampaign, getCalendar, getSeriesBible, getCompetitors } from '@/lib/storage';
+import type { BrandSnapshot, Campaign, ContentRow, SeriesBible, CompetitorEntry, KolEntry } from '@/types/content';
+import { getBrand, getCampaign, getCalendar, getSeriesBible, getCompetitors, getKols } from '@/lib/storage';
 import Button from './Button';
 import Note from './Note';
 import Footer from './Footer';
@@ -25,6 +25,7 @@ export default function HomeView() {
   const [calendar, setCalendar] = useState<ContentRow[]>([]);
   const [bible, setBible] = useState<SeriesBible | null>(null);
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([]);
+  const [kols, setKols] = useState<KolEntry[]>([]);
 
   useEffect(() => {
     setBrand(getBrand());
@@ -32,6 +33,7 @@ export default function HomeView() {
     setCalendar(getCalendar());
     setBible(getSeriesBible());
     setCompetitors(getCompetitors());
+    setKols(getKols());
     setMounted(true);
   }, []);
 
@@ -42,6 +44,7 @@ export default function HomeView() {
   const hasCampaign = !!campaign;
   const hasCalendar = calendar.length > 0;
   const hasCompetitors = competitors.length > 0;
+  const hasKols = kols.length > 0;
 
   return (
     <>
@@ -117,6 +120,15 @@ export default function HomeView() {
             btn={hasCompetitors ? 'Buka Audit' : 'Mulai Audit'}
             href="/competitor-audit"
           />
+          <StatusCard
+            icon="🤝"
+            title="KOL / UGC Brief"
+            tone={hasKols ? 'ok' : 'warn'}
+            pill={hasKols ? kols.length + ' KOL' : 'Belum diisi'}
+            desc="Brief kerja sama untuk KOL/kreator lokal plus daftar kandidat dan statusnya."
+            btn={hasKols ? 'Buka Brief' : 'Buat Brief'}
+            href="/kol-brief"
+          />
         </div>
       </section>
 
@@ -143,6 +155,10 @@ export default function HomeView() {
             <li>
               <strong>5. Audit Kompetitor</strong> — pelajari konten kompetitor dan
               temukan celah yang bisa kita menangkan. <Button href="/competitor-audit" variant="ghost" size="tiny">Buka</Button>
+            </li>
+            <li>
+              <strong>6. KOL / UGC Brief</strong> — siapkan brief kerja sama untuk
+              kreator lokal dan catat kandidatnya. <Button href="/kol-brief" variant="ghost" size="tiny">Buka</Button>
             </li>
           </ol>
         </div>

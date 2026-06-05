@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { route: 'campaign-setup', href: '/campaign-setup', label: 'Rencana Campaign' },
   { route: 'content-calendar', href: '/content-calendar', label: 'Rencana Konten' },
   { route: 'competitor-audit', href: '/competitor-audit', label: 'Audit Kompetitor' },
+  { route: 'kol-brief', href: '/kol-brief', label: 'KOL Brief' },
 ];
 
 export default function Header() {
