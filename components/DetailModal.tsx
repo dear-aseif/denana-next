@@ -188,7 +188,7 @@ export default function DetailModal({
           <Section
             n={3}
             icon="🎥"
-            title="Video Script (Reels / Facebook)"
+            title="Panduan Video (Reels / Facebook)"
             copyValue={t.script}
             label="Script"
           >
@@ -208,9 +208,9 @@ export default function DetailModal({
           <Section
             n={4}
             icon="🎨"
-            title="Visual Direction"
+            title="Arahan Visual"
             copyValue={detail.visualDirection}
-            label="Visual direction"
+            label="Arahan visual"
           >
             <div className="detail-box">{detail.visualDirection}</div>
           </Section>
@@ -245,9 +245,9 @@ export default function DetailModal({
           <Section
             n={7}
             icon="✅"
-            title="Production Checklist"
+            title="Checklist Sebelum Posting"
             copyValue={detail.checklist.map((c) => '- ' + c).join('\n')}
-            label="Checklist"
+            label="Checklist posting"
           >
             <ul className="chk">
               {detail.checklist.map((c, i) => (

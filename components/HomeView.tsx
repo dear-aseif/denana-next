@@ -171,8 +171,9 @@ export default function HomeView() {
       <section>
         <Note icon="💡">
           Phase 1 fokus pada fondasi organik: profil brand, rencana campaign, dan
-          rencana konten 30 hari untuk <strong>Facial Treatment</strong>. Belum ada
-          login, database, atau koneksi AI — semua data tersimpan lokal di browser.
+          rencana konten 30 hari untuk <strong>Facial Treatment</strong>. Semua data
+          tersimpan langsung di browser perangkat ini — tidak perlu akun, tidak
+          terhubung ke internet.
         </Note>
       </section>
 

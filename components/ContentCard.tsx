@@ -58,7 +58,7 @@ export default function ContentCard({
   onCopy: (id: string) => void;
 }) {
   const sc = pillarShort(row.pillar);
-  const detailLabel = hasDraft ? '📝 Draft' : '✍️ Buat';
+  const detailLabel = hasDraft ? '📝 Ada Draft' : '✍️ Buat Caption';
 
   return (
     <tr data-id={row.id}>

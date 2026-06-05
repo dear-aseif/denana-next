@@ -15,7 +15,7 @@ const HEADERS = [
   'Pilar',
   'Topik & Hook',
   'CTA',
-  'Objective',
+  'Tujuan',
   'Status',
   'Aksi',
 ];
