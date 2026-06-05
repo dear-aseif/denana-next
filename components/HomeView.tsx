@@ -15,7 +15,8 @@ import Footer from './Footer';
 import EmptyState from './EmptyState';
 import StatusCard from './StatusCard';
 
-const stepListStyle: React.CSSProperties = { margin: 0, paddingLeft: 0, listStyle: 'none' };
+/* stepListStyle: no kv grid — plain vertical flex list so steps stack correctly */
+const stepListStyle: React.CSSProperties = { margin: 0, paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 };
 const quickHeadStyle: React.CSSProperties = { marginTop: 0 };
 const sectionLabelStyle: React.CSSProperties = { marginBottom: 6, marginTop: 0 };
 const sectionDescStyle: React.CSSProperties = { marginTop: 0, marginBottom: 14 };
@@ -77,7 +78,7 @@ export default function HomeView() {
 
       {/* ---- Alur Utama ---- */}
       <section>
-        <span className="notion-eyebrow" style={sectionLabelStyle}>Alur Utama</span>
+        <p className="notion-eyebrow" style={sectionLabelStyle}>Alur Utama</p>
         <div className="grid grid-3">
           <StatusCard
             icon="💄"
@@ -111,7 +112,7 @@ export default function HomeView() {
 
       {/* ---- Tools Pendukung (opsional) ---- */}
       <section>
-        <span className="notion-eyebrow" style={sectionLabelStyle}>Tools Pendukung</span>
+        <p className="notion-eyebrow" style={sectionLabelStyle}>Tools Pendukung</p>
         <p className="notion-muted" style={sectionDescStyle}>
           Modul opsional — gunakan setelah alur utama berjalan.
         </p>
@@ -150,7 +151,7 @@ export default function HomeView() {
       <section>
         <div className="card">
           <h3 style={quickHeadStyle}>Langkah cepat</h3>
-          <ol className="kv" style={stepListStyle}>
+          <ol style={stepListStyle}>
             <li>
               <strong>1. Profil Brand</strong> — isi identitas, layanan facial,
               dan content pillars. <Button href="/brand-setup" variant="ghost" size="tiny">Buka</Button>
