@@ -701,10 +701,13 @@ h1 { font-size: clamp(20px, 2.5vw, 28px); margin: 0 0 6px; letter-spacing: -0.01
 h2 { font-size: 17px; margin: 0 0 8px; letter-spacing: -0.01em; }
 h3 { font-size: 14px; margin: 0 0 5px; }
 
-/* ---- App shell flex container ---- */
+/* ---- App shell wrapper ----
+   Sidebar is position:fixed so it is out of normal flow.
+   No flex needed here — app-content fills the remaining width
+   automatically as a plain block with margin-left: 220px. */
 .app-layout {
-  display: flex;
   min-height: 100vh;
+  background: var(--notion-bg-soft);
 }
 
 /* ---- Sidebar — fixed so it stays put while content scrolls ---- */
@@ -821,11 +824,13 @@ h3 { font-size: 14px; margin: 0 0 5px; }
   flex-shrink: 0;
 }
 
-/* ---- Content area — offset by sidebar width so it never slides under it ---- */
+/* ---- Content area — offset by sidebar width, fills full remaining width ---- */
 .app-content {
-  margin-left: 220px;
+  margin-left: 220px;   /* sidebar is 220px fixed */
   min-height: 100vh;
+  width: calc(100% - 220px);
   background: var(--notion-bg-soft);
+  box-sizing: border-box;
 }
 
 /* ---- Shell: compact centered container ---- */
@@ -912,7 +917,7 @@ section { margin-top: 22px; }
 /* ---- Mobile: sidebar off, bottom nav on ---- */
 @media (max-width: 860px) {
   .app-sidebar { display: none; }
-  .app-content { margin-left: 0; }
+  .app-content { margin-left: 0; width: 100%; }
   .bottom-nav {
     display: flex;
     position: fixed;
