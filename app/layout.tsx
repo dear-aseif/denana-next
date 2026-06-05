@@ -22,8 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ToastProvider>
           <RouteBodyClass />
-          <Header />
-          {children}
+          <div className="app-layout">
+            <Header />
+            <div className="app-content">{children}</div>
+          </div>
         </ToastProvider>
       </body>
     </html>

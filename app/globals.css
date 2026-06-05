@@ -685,3 +685,240 @@ body {
     padding-right: 16px;
   }
 }
+
+/* ============================================================
+   DASHBOARD LAYOUT — sidebar (desktop) + bottom nav (mobile)
+   Layout refinement only. All functions, data, localStorage,
+   and Phase 1 scope are completely unchanged.
+   Brand direction: white + gold, clean minimal dashboard feel.
+   ============================================================ */
+
+/* Suppress old top-bar header (replaced by sidebar) */
+.app-header { display: none !important; }
+
+/* ---- Compact typography ---- */
+h1 { font-size: clamp(20px, 2.5vw, 28px); margin: 0 0 6px; letter-spacing: -0.015em; }
+h2 { font-size: 17px; margin: 0 0 8px; letter-spacing: -0.01em; }
+h3 { font-size: 14px; margin: 0 0 5px; }
+
+/* ---- App shell flex container ---- */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---- Sidebar ---- */
+.app-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--notion-surface);
+  border-right: 1px solid var(--notion-border-soft);
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 14px 14px;
+  border-bottom: 1px solid var(--notion-border-soft);
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  background: linear-gradient(135deg, #e7d199, #c9a13b 60%, #a8841f);
+  box-shadow: 0 2px 6px rgba(168,132,31,.3);
+  flex-shrink: 0;
+}
+.sidebar-brand-text { min-width: 0; }
+.sidebar-brand-name {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--notion-text);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sidebar-brand-sub {
+  display: block;
+  font-size: 10.5px;
+  color: var(--notion-text-faint);
+  margin-top: 1px;
+}
+.sidebar-nav {
+  flex: 1;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-y: auto;
+}
+.sidebar-section-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--notion-text-faint);
+  padding: 10px 8px 4px;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--notion-text-soft);
+  text-decoration: none;
+  transition: background .13s, color .13s;
+  border: 1px solid transparent;
+}
+.sidebar-link:hover {
+  background: var(--gold-bg);
+  color: var(--gold-deep);
+}
+.sidebar-link.active {
+  background: var(--gold-bg);
+  color: var(--gold-deep);
+  font-weight: 600;
+  border-color: rgba(201,161,59,.25);
+}
+.sidebar-link-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sidebar-divider {
+  height: 1px;
+  background: var(--notion-border-soft);
+  margin: 8px 4px;
+}
+.sidebar-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--notion-border-soft);
+  font-size: 11px;
+  color: var(--notion-text-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* ---- Content area (right of sidebar) ---- */
+.app-content {
+  flex: 1;
+  min-width: 0;
+  background: var(--notion-bg-soft);
+}
+
+/* ---- Shell: compact centered container ---- */
+.shell {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 28px 28px 80px;
+}
+body.wide-page .shell {
+  max-width: 100%;
+  padding: 22px 24px 80px;
+}
+
+/* ---- Compact cards ---- */
+.card { padding: 16px 18px; }
+.card + .card { margin-top: 12px; }
+.status-card { gap: 6px; }
+.status-card .ico { width: 34px; height: 34px; font-size: 16px; border-radius: 8px; }
+.status-card h3 { font-size: 14px; margin: 0; }
+
+/* Status card: entire card is a clickable link */
+.status-card-link {
+  display: block;
+  text-decoration: none;
+  border-radius: var(--notion-radius);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.status-card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(150,120,40,.1);
+}
+.status-card-link:hover .card {
+  border-color: var(--gold-soft);
+}
+.status-card-action {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold-deep);
+  margin-top: 2px;
+  opacity: .85;
+}
+
+/* ---- Compact section spacing ---- */
+section { margin-top: 22px; }
+.page-head { margin-bottom: 18px; }
+.page-head p { font-size: 13px; margin: 4px 0 0; max-width: 560px; }
+.notion-eyebrow { font-size: 10.5px; letter-spacing: .1em; }
+
+/* Responsive grid */
+@media (max-width: 700px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .grid-3, .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ---- Bottom nav placeholder (always hidden until mobile query) ---- */
+.bottom-nav { display: none; }
+
+/* ---- Mobile: sidebar off, bottom nav on ---- */
+@media (max-width: 860px) {
+  .app-sidebar { display: none; }
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    background: var(--notion-surface);
+    border-top: 1px solid var(--notion-border-soft);
+    z-index: 60;
+    box-shadow: 0 -1px 10px rgba(0,0,0,.05);
+  }
+  .shell {
+    padding-top: 20px;
+    padding-bottom: 72px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+.bottom-nav-link {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--notion-text-faint);
+  transition: color .13s;
+  padding: 4px 2px;
+}
+.bottom-nav-link.active { color: var(--gold-deep); }
+.bottom-nav-link:hover { color: var(--gold-deep); }
+.bottom-nav-icon { font-size: 17px; line-height: 1; }
+.bottom-nav-label { font-size: 9px; font-weight: 600; line-height: 1; }
+
