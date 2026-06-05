@@ -60,17 +60,19 @@ export default function Header() {
 
           <div className="sidebar-divider" />
 
-          <span className="sidebar-section-label">Tools Pendukung</span>
-          {NAV_TOOLS.map((item) => (
-            <Link
-              key={item.route}
-              href={item.href}
-              className={'sidebar-link' + (isActive(item.href) ? ' active' : '')}
-            >
-              <span className="sidebar-link-icon">{item.icon}</span>
-              {item.label}
-            </Link>
-          ))}
+          <div className="sidebar-tools-group">
+            <span className="sidebar-section-label">Tools Pendukung</span>
+            {NAV_TOOLS.map((item) => (
+              <Link
+                key={item.route}
+                href={item.href}
+                className={'sidebar-link' + (isActive(item.href) ? ' active' : '')}
+              >
+                <span className="sidebar-link-icon">{item.icon}</span>
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </nav>
 
         <div className="sidebar-footer">
