@@ -17,6 +17,8 @@ import StatusCard from './StatusCard';
 
 const stepListStyle: React.CSSProperties = { margin: 0, paddingLeft: 0, listStyle: 'none' };
 const quickHeadStyle: React.CSSProperties = { marginTop: 0 };
+const sectionLabelStyle: React.CSSProperties = { marginBottom: 6, marginTop: 0 };
+const sectionDescStyle: React.CSSProperties = { marginTop: 0, marginBottom: 14 };
 
 export default function HomeView() {
   const [mounted, setMounted] = useState(false);
@@ -73,7 +75,9 @@ export default function HomeView() {
         </section>
       ) : null}
 
+      {/* ---- Alur Utama ---- */}
       <section>
+        <span className="notion-eyebrow" style={sectionLabelStyle}>Alur Utama</span>
         <div className="grid grid-3">
           <StatusCard
             icon="💄"
@@ -83,15 +87,6 @@ export default function HomeView() {
             desc="Identitas, layanan facial, tone of voice, dan content pillars."
             btn={hasBrand ? 'Tinjau Profil' : 'Isi Sekarang'}
             href="/brand-setup"
-          />
-          <StatusCard
-            icon="📖"
-            title="Series Bible"
-            tone={hasBible ? 'ok' : 'warn'}
-            pill={hasBible ? 'Tersimpan' : 'Belum dibuat'}
-            desc="Manifesto, persona, visual DNA, caption framework, dan posting strategy."
-            btn={hasBible ? 'Buka Series Bible' : 'Buat Series Bible'}
-            href="/series-bible"
           />
           <StatusCard
             icon="📅"
@@ -111,12 +106,31 @@ export default function HomeView() {
             btn={hasCalendar ? 'Buka Rencana' : 'Buat Rencana'}
             href="/content-calendar"
           />
+        </div>
+      </section>
+
+      {/* ---- Tools Pendukung (opsional) ---- */}
+      <section>
+        <span className="notion-eyebrow" style={sectionLabelStyle}>Tools Pendukung</span>
+        <p className="notion-muted" style={sectionDescStyle}>
+          Modul opsional — gunakan setelah alur utama berjalan.
+        </p>
+        <div className="grid grid-3">
+          <StatusCard
+            icon="📖"
+            title="Series Bible"
+            tone={hasBible ? 'ok' : 'warn'}
+            pill={hasBible ? 'Tersimpan' : 'Belum dibuat'}
+            desc="Manifesto, persona, visual DNA, caption framework, dan posting strategy."
+            btn={hasBible ? 'Buka Series Bible' : 'Buat Series Bible'}
+            href="/series-bible"
+          />
           <StatusCard
             icon="🔍"
             title="Audit Kompetitor"
             tone={hasCompetitors ? 'ok' : 'warn'}
             pill={hasCompetitors ? competitors.length + ' kompetitor' : 'Belum diisi'}
-            desc="Panduan audit konten organik kompetitor plus catatan kekuatan, kelemahan, dan celah peluang."
+            desc="Panduan audit konten organik kompetitor dan catatan kekuatan serta celah peluang."
             btn={hasCompetitors ? 'Buka Audit' : 'Mulai Audit'}
             href="/competitor-audit"
           />
@@ -132,33 +146,22 @@ export default function HomeView() {
         </div>
       </section>
 
+      {/* ---- Langkah cepat (3 alur utama) ---- */}
       <section>
         <div className="card">
           <h3 style={quickHeadStyle}>Langkah cepat</h3>
           <ol className="kv" style={stepListStyle}>
             <li>
-              <strong>1. Profil Brand</strong> — pastikan identitas dan layanan
-              facial sudah benar. <Button href="/brand-setup" variant="ghost" size="tiny">Buka</Button>
+              <strong>1. Profil Brand</strong> — isi identitas, layanan facial,
+              dan content pillars. <Button href="/brand-setup" variant="ghost" size="tiny">Buka</Button>
             </li>
             <li>
-              <strong>2. Series Bible</strong> — susun fondasi brand (manifesto,
-              persona, visual, caption). <Button href="/series-bible" variant="ghost" size="tiny">Buka</Button>
+              <strong>2. Rencana Campaign</strong> — atur periode, tujuan, dan
+              frekuensi posting. <Button href="/campaign-setup" variant="ghost" size="tiny">Buka</Button>
             </li>
             <li>
-              <strong>3. Rencana Campaign</strong> — atur periode dan tujuan
-              awareness. <Button href="/campaign-setup" variant="ghost" size="tiny">Buka</Button>
-            </li>
-            <li>
-              <strong>4. Rencana Konten</strong> — buat 30 konten lalu susun caption
-              &amp; script. <Button href="/content-calendar" variant="ghost" size="tiny">Buka</Button>
-            </li>
-            <li>
-              <strong>5. Audit Kompetitor</strong> — pelajari konten kompetitor dan
-              temukan celah yang bisa kita menangkan. <Button href="/competitor-audit" variant="ghost" size="tiny">Buka</Button>
-            </li>
-            <li>
-              <strong>6. KOL / UGC Brief</strong> — siapkan brief kerja sama untuk
-              kreator lokal dan catat kandidatnya. <Button href="/kol-brief" variant="ghost" size="tiny">Buka</Button>
+              <strong>3. Rencana Konten</strong> — buat 30 konten beserta caption,
+              script, dan hashtag. <Button href="/content-calendar" variant="ghost" size="tiny">Buka</Button>
             </li>
           </ol>
         </div>

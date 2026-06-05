@@ -13,14 +13,15 @@ import { usePathname } from 'next/navigation';
 
 type NavItem = { route: string; href: string; label: string };
 
+/* Core nav — keep to 4 items per scope lock.
+ * Optional tools (Series Bible, Audit Kompetitor, KOL Brief) are accessible
+ * from the Home dashboard but are NOT listed in the main navigation bar.
+ */
 const NAV: NavItem[] = [
   { route: 'home', href: '/', label: 'Home' },
   { route: 'brand-setup', href: '/brand-setup', label: 'Profil Brand' },
-  { route: 'series-bible', href: '/series-bible', label: 'Series Bible' },
   { route: 'campaign-setup', href: '/campaign-setup', label: 'Rencana Campaign' },
   { route: 'content-calendar', href: '/content-calendar', label: 'Rencana Konten' },
-  { route: 'competitor-audit', href: '/competitor-audit', label: 'Audit Kompetitor' },
-  { route: 'kol-brief', href: '/kol-brief', label: 'KOL Brief' },
 ];
 
 export default function Header() {
