@@ -15,6 +15,7 @@ import type {
   ContentDraft,
   DraftMap,
   SeriesBible,
+  CompetitorEntry,
 } from '@/types/content';
 
 function isBrowser(): boolean {
@@ -71,6 +72,14 @@ export function saveSeriesBible(data: SeriesBible): boolean {
   return save(STORAGE_KEYS.seriesBible, data);
 }
 
+/* ---------- Competitor Audit (Module 1.2B) ---------- */
+export function getCompetitors(): CompetitorEntry[] {
+  return load<CompetitorEntry[]>(STORAGE_KEYS.competitorAudit, []);
+}
+export function saveCompetitors(rows: CompetitorEntry[]): boolean {
+  return save(STORAGE_KEYS.competitorAudit, rows);
+}
+
 /* ---------- Drafts ---------- */
 export function getDrafts(): DraftMap {
   return load<DraftMap>(STORAGE_KEYS.contentDrafts, {}) || {};
@@ -100,6 +109,7 @@ export function resetAllLocalData(): void {
     STORAGE_KEYS.contentCalendar,
     STORAGE_KEYS.contentDrafts,
     STORAGE_KEYS.seriesBible,
+    STORAGE_KEYS.competitorAudit,
   ].forEach((k) => {
     try {
       window.localStorage.removeItem(k);

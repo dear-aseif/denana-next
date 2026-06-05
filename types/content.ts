@@ -186,3 +186,34 @@ export interface SeriesBible {
   postingStrategy: PostingStrategy;
   hashtags: string[];
 }
+
+/* ---------- Competitor Organic Audit (Module 1.2B) ---------- */
+
+/** One focus area to evaluate when auditing a competitor. */
+export interface AuditFocusArea {
+  area: string;
+  question: string;
+  lookFor: string[];
+}
+
+/** The generated audit framework, derived from the Brand Snapshot. */
+export interface AuditFramework {
+  generatedAt: string;
+  businessName: string;
+  intro: string;
+  focusAreas: AuditFocusArea[];
+  gapSignals: string[];
+  ourAngles: string[];
+  tips: string[];
+}
+
+/** A single competitor entry, filled in manually by the user. */
+export interface CompetitorEntry {
+  id: string;
+  name: string;
+  handle: string;
+  followers: string;
+  strengths: string;
+  weaknesses: string;
+  opportunities: string;
+}

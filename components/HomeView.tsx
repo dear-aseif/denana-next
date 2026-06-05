@@ -7,8 +7,8 @@
  * quick-steps card, and the scope note.
  */
 import React, { useEffect, useState } from 'react';
-import type { BrandSnapshot, Campaign, ContentRow, SeriesBible } from '@/types/content';
-import { getBrand, getCampaign, getCalendar, getSeriesBible } from '@/lib/storage';
+import type { BrandSnapshot, Campaign, ContentRow, SeriesBible, CompetitorEntry } from '@/types/content';
+import { getBrand, getCampaign, getCalendar, getSeriesBible, getCompetitors } from '@/lib/storage';
 import Button from './Button';
 import Note from './Note';
 import Footer from './Footer';
@@ -24,12 +24,14 @@ export default function HomeView() {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [calendar, setCalendar] = useState<ContentRow[]>([]);
   const [bible, setBible] = useState<SeriesBible | null>(null);
+  const [competitors, setCompetitors] = useState<CompetitorEntry[]>([]);
 
   useEffect(() => {
     setBrand(getBrand());
     setCampaign(getCampaign());
     setCalendar(getCalendar());
     setBible(getSeriesBible());
+    setCompetitors(getCompetitors());
     setMounted(true);
   }, []);
 
@@ -39,6 +41,7 @@ export default function HomeView() {
   const hasBible = !!bible;
   const hasCampaign = !!campaign;
   const hasCalendar = calendar.length > 0;
+  const hasCompetitors = competitors.length > 0;
 
   return (
     <>
@@ -105,6 +108,15 @@ export default function HomeView() {
             btn={hasCalendar ? 'Buka Rencana' : 'Buat Rencana'}
             href="/content-calendar"
           />
+          <StatusCard
+            icon="🔍"
+            title="Audit Kompetitor"
+            tone={hasCompetitors ? 'ok' : 'warn'}
+            pill={hasCompetitors ? competitors.length + ' kompetitor' : 'Belum diisi'}
+            desc="Panduan audit konten organik kompetitor plus catatan kekuatan, kelemahan, dan celah peluang."
+            btn={hasCompetitors ? 'Buka Audit' : 'Mulai Audit'}
+            href="/competitor-audit"
+          />
         </div>
       </section>
 
@@ -127,6 +139,10 @@ export default function HomeView() {
             <li>
               <strong>4. Rencana Konten</strong> — buat 30 konten lalu susun caption
               &amp; script. <Button href="/content-calendar" variant="ghost" size="tiny">Buka</Button>
+            </li>
+            <li>
+              <strong>5. Audit Kompetitor</strong> — pelajari konten kompetitor dan
+              temukan celah yang bisa kita menangkan. <Button href="/competitor-audit" variant="ghost" size="tiny">Buka</Button>
             </li>
           </ol>
         </div>

@@ -26,6 +26,7 @@ export const STORAGE_KEYS = {
   contentCalendar: 'denana_content_calendar',
   contentDrafts: 'denana_content_drafts',
   seriesBible: 'denana_series_bible',
+  competitorAudit: 'denana_competitor_audit',
 } as const;
 
 /* ---------- Defaults ---------- */

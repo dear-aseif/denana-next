@@ -19,6 +19,7 @@ const NAV: NavItem[] = [
   { route: 'series-bible', href: '/series-bible', label: 'Series Bible' },
   { route: 'campaign-setup', href: '/campaign-setup', label: 'Rencana Campaign' },
   { route: 'content-calendar', href: '/content-calendar', label: 'Rencana Konten' },
+  { route: 'competitor-audit', href: '/competitor-audit', label: 'Audit Kompetitor' },
 ];
 
 export default function Header() {
