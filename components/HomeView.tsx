@@ -65,8 +65,8 @@ export default function HomeView() {
           <div className="card">
             <EmptyState
               big="💎"
-              title="Mulai dari Profil Brand"
-              action={<Button href="/brand-setup">Isi Profil Brand →</Button>}
+              title="Mulai dari panduan singkat"
+              action={<Button href="/brand-setup">Mulai panduan setup →</Button>}
             >
               Lengkapi profil brand DenanavBeauty Salon dulu untuk mulai membuat
               rencana konten 30 hari.

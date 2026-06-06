@@ -53,7 +53,7 @@ export const defaultBrandSnapshot: BrandSnapshot = {
   tagline: 'Wajah lebih fresh, percaya diri setiap hari.',
   platforms: 'Instagram, Facebook',
   contentPillars:
-    'Facial Education\nSkin Concern & Solution\nTreatment Experience\nTestimonial & Trust\nPromo & Booking Awareness',
+    'Edukasi Facial\nMasalah & Solusi Kulit\nPengalaman Treatment\nTestimoni & Kepercayaan\nPromo & Booking',
 };
 
 export function defaultCampaign(): Campaign {
@@ -109,28 +109,28 @@ export const BRAND_FIELDS: BrandField[] = [
 
 /* ---------- Pillars ---------- */
 export const PILLARS: Pillar[] = [
-  'Facial Education',
-  'Skin Concern & Solution',
-  'Treatment Experience',
-  'Testimonial & Trust',
-  'Promo & Booking Awareness',
+  'Edukasi Facial',
+  'Masalah & Solusi Kulit',
+  'Pengalaman Treatment',
+  'Testimoni & Kepercayaan',
+  'Promo & Booking',
 ];
 
 // 30-day ratio: 40/25/15/10/10 -> 12 / 8 / 4 / 3 / 3
 export const PILLAR_PLAN: PillarPlanEntry[] = [
-  { pillar: 'Facial Education', count: 12 },
-  { pillar: 'Skin Concern & Solution', count: 8 },
-  { pillar: 'Treatment Experience', count: 4 },
-  { pillar: 'Testimonial & Trust', count: 3 },
-  { pillar: 'Promo & Booking Awareness', count: 3 },
+  { pillar: 'Edukasi Facial', count: 12 },
+  { pillar: 'Masalah & Solusi Kulit', count: 8 },
+  { pillar: 'Pengalaman Treatment', count: 4 },
+  { pillar: 'Testimoni & Kepercayaan', count: 3 },
+  { pillar: 'Promo & Booking', count: 3 },
 ];
 
 const PILLAR_SHORT: Record<string, string> = {
-  'Facial Education': 'Facial',
-  'Skin Concern & Solution': 'Skin',
-  'Treatment Experience': 'Treatment',
-  'Testimonial & Trust': 'Testimonial',
-  'Promo & Booking Awareness': 'Promo',
+  'Edukasi Facial': 'Facial',
+  'Masalah & Solusi Kulit': 'Skin',
+  'Pengalaman Treatment': 'Treatment',
+  'Testimoni & Kepercayaan': 'Testimonial',
+  'Promo & Booking': 'Promo',
 };
 
 export function pillarShort(p: string): string {
@@ -151,11 +151,11 @@ export const FIRST_WEEK_FORMATS: ContentFormat[] = [
 ];
 
 export const OBJECTIVES: Objective[] = ['Awareness', 'Engagement', 'Trust', 'Booking'];
-export const STATUSES: ProductionStatus[] = ['Idea', 'Planned', 'In Production', 'Posted'];
+export const STATUSES: ProductionStatus[] = ['Ide', 'Direncanakan', 'Sedang Dibuat', 'Sudah Diposting'];
 
 /* ---------- Facial-only content banks (Bahasa Indonesia) ---------- */
 export const TOPIC_BANK: Record<string, TopicBankItem[]> = {
-  'Facial Education': [
+  'Edukasi Facial': [
     { t: 'Apa itu Hydra Peel dan kapan wajah membutuhkannya?', h: 'Sering dengar Hydra Peel tapi belum tahu fungsinya?', f: 'Reels' },
     { t: 'Cara menjaga wajah tetap fresh di cuaca Bima', h: 'Tips sederhana menjaga wajah tetap fresh di cuaca Bima.', f: 'Single Post' },
     { t: 'Mempersiapkan wajah sebelum acara penting', h: 'Ada acara penting? Yuk siapkan wajahmu dari jauh hari.', f: 'Carousel' },
@@ -173,7 +173,7 @@ export const TOPIC_BANK: Record<string, TopicBankItem[]> = {
     { t: 'Tanda wajah sedang butuh perhatian ekstra', h: 'Wajah mulai terasa kurang fresh? Perhatikan tanda ini.', f: 'Reels' },
     { t: 'Kenapa konsultasi sebelum facial itu penting', h: 'Sebelum facial, kenapa perlu konsultasi dulu?', f: 'Single Post' },
   ],
-  'Skin Concern & Solution': [
+  'Masalah & Solusi Kulit': [
     { t: 'Kenapa wajah terlihat kusam walau sudah cuci muka?', h: 'Sudah rajin cuci muka tapi wajah tetap kusam?', f: 'Reels' },
     { t: 'Kulit terasa kusam karena cuaca panas di Kota Bima', h: 'Cuaca panas bikin wajah terasa kusam dan lelah?', f: 'Reels' },
     { t: 'Komedo terasa menumpuk? Ini yang bisa membantu', h: 'Komedo balik lagi terus? Yuk pahami penyebabnya.', f: 'Carousel' },
@@ -186,7 +186,7 @@ export const TOPIC_BANK: Record<string, TopicBankItem[]> = {
     { t: 'Kulit terasa kering dan kurang nyaman', h: 'Kulit terasa kering dan ketarik?', f: 'Single Post' },
     { t: 'Warna kulit terlihat kurang merata', h: 'Warna wajah terlihat belang dan kurang rata?', f: 'Carousel' },
   ],
-  'Treatment Experience': [
+  'Pengalaman Treatment': [
     { t: 'Step-by-step facial treatment di DenanavBeauty Salon', h: 'Penasaran serunya facial di DenanavBeauty Salon?', f: 'Reels' },
     { t: 'Self-care wajah setelah aktivitas seharian', h: 'Capek setelah seharian beraktivitas? Sempatkan self-care.', f: 'Stories' },
     { t: 'Suasana treatment room yang bersih dan nyaman', h: 'Intip suasana treatment room kami.', f: 'Stories' },
@@ -195,14 +195,14 @@ export const TOPIC_BANK: Record<string, TopicBankItem[]> = {
     { t: 'Pengalaman facial pertama kali, apa yang dirasakan?', h: 'Baru pertama facial? Begini rasanya.', f: 'Carousel' },
     { t: 'Alat dan persiapan sebelum treatment dimulai', h: 'Kebersihan alat jadi prioritas kami.', f: 'Stories' },
   ],
-  'Testimonial & Trust': [
+  'Testimoni & Kepercayaan': [
     { t: 'Cerita customer setelah rutin facial treatment', h: 'Dengar cerita customer kami yuk.', f: 'Carousel' },
     { t: 'FAQ calon customer sebelum facial pertama', h: 'Pertanyaan yang sering ditanyakan sebelum facial.', f: 'Carousel' },
     { t: 'Kenapa customer merasa nyaman treatment di sini', h: 'Hal kecil yang bikin treatment terasa nyaman.', f: 'Single Post' },
     { t: 'Bagaimana kami menjelaskan treatment sebelum mulai', h: 'Sebelum mulai, kami jelaskan dulu prosesnya.', f: 'Reels' },
     { t: 'Komitmen kebersihan di setiap treatment', h: 'Kebersihan adalah hal yang tidak kami tawar.', f: 'Single Post' },
   ],
-  'Promo & Booking Awareness': [
+  'Promo & Booking': [
     { t: 'Facial treatment mulai Rp350.000, cocok untuk siapa?', h: 'Facial treatment mulai Rp350.000, ini untukmu?', f: 'Single Post' },
     { t: 'Cara booking facial treatment di DenanavBeauty Salon', h: 'Mau facial? Begini cara bookingnya.', f: 'Carousel' },
     { t: 'Reminder self-care mingguan untuk wajahmu', h: 'Sudah luangkan waktu untuk wajahmu minggu ini?', f: 'Stories' },
@@ -212,27 +212,27 @@ export const TOPIC_BANK: Record<string, TopicBankItem[]> = {
 };
 
 export const CTA_BANK: Record<string, string[]> = {
-  'Facial Education': [
+  'Edukasi Facial': [
     'Simpan dulu kalau kamu lagi cari info facial di Kota Bima.',
     'Konsultasi dulu untuk kenali treatment yang cocok untukmu.',
     'Simpan dulu untuk referensi facial kamu.',
   ],
-  'Skin Concern & Solution': [
+  'Masalah & Solusi Kulit': [
     'Konsultasikan dulu kondisi kulitmu dengan tim kami.',
     'Kirim pesan kalau ingin tahu treatment yang cocok.',
     'Boleh tanya dulu di komentar atau WhatsApp.',
   ],
-  'Treatment Experience': [
+  'Pengalaman Treatment': [
     'Booking facial treatment via website atau WhatsApp.',
     'Cek slot treatment minggu ini lewat website atau WhatsApp.',
     'Konsultasi dulu sebelum treatment pertamamu.',
   ],
-  'Testimonial & Trust': [
+  'Testimoni & Kepercayaan': [
     'Konsultasi dulu sebelum booking, kami bantu jelaskan.',
     'Hubungi kami via website atau WhatsApp untuk tanya-tanya.',
     'Simpan dulu kalau kamu sedang cari facial terpercaya di Kota Bima.',
   ],
-  'Promo & Booking Awareness': [
+  'Promo & Booking': [
     'Booking facial treatment via website atau WhatsApp.',
     'Cek slot treatment minggu ini sebelum penuh.',
     'Konsultasi dulu, lalu booking via website atau WhatsApp.',
