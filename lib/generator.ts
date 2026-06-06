@@ -24,6 +24,105 @@ import type {
 import { toISO, dayName, uid } from './utils';
 
 /* ============================================================
+   BATCH 3 — Content variation helpers (deterministic, no AI)
+   Reduces repetitive captions & video scripts by rotating
+   brand-consistent variations and adapting to treatment type.
+   ============================================================ */
+type TreatmentType = 'Microdermabrasion' | 'Hydra Peel' | 'Totok wajah' | 'General';
+
+/* Detect the treatment a content idea is about, from its topic + hook. */
+function detectTreatment(text: string): TreatmentType {
+  const s = (text || '').toLowerCase();
+  if (s.includes('hydra peel') || s.includes('hydrapeel')) return 'Hydra Peel';
+  if (s.includes('microdermabrasion') || s.includes('mikrodermabrasi'))
+    return 'Microdermabrasion';
+  if (s.includes('totok')) return 'Totok wajah';
+  return 'General';
+}
+
+/* Stable seed from a string so the same idea always picks the same
+   variation (keeps regenerate / saved drafts predictable). */
+function variationSeed(text: string): number {
+  let h = 0;
+  for (let i = 0; i < text.length; i++) {
+    h = (h * 31 + text.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+/* 5 brand-consistent caption middle paragraphs, rotated across the 30 days. */
+const CAPTION_BODIES: string[] = [
+  'Di DenanavBeauty Salon, kami fokus membantu wajah terlihat lebih fresh dan bersih lewat facial treatment yang nyaman. Setiap langkah dijelaskan dulu sebelum dimulai, jadi kamu bisa lebih rileks.',
+  'Lewat facial treatment di DenanavBeauty Salon, kami bantu merawat kulit wajahmu dengan cara yang lembut. Suasana salon dibuat tenang supaya kamu nyaman dari awal sampai selesai.',
+  'Di DenanavBeauty Salon, perawatan wajah bukan cuma soal tampilan, tapi juga pengalaman yang menyenangkan. Tim kami siap bantu pilih treatment yang sesuai dengan kondisi kulitmu.',
+  'Kami percaya perawatan wajah yang baik dimulai dari kenyamanan. Karena itu setiap facial treatment di DenanavBeauty Salon dilakukan perlahan dengan alat yang bersih dan terjaga.',
+  'Facial treatment di DenanavBeauty Salon dibuat untuk membantu kulit terasa lebih segar dan terawat. Kebersihan dan kenyamanan selalu kami utamakan di setiap kunjungan.',
+];
+
+/* Soft, treatment-specific sentence added to the body (no medical claims,
+   no guaranteed results). */
+const TREATMENT_CAPTION_LINE: Record<TreatmentType, string> = {
+  Microdermabrasion:
+    'Microdermabrasion membantu mengangkat sel kulit mati secara lembut sehingga wajah terasa lebih halus.',
+  'Hydra Peel':
+    'Hydra Peel membantu membersihkan dan menjaga kelembapan kulit supaya wajah terasa lebih segar.',
+  'Totok wajah':
+    'Totok wajah bisa jadi momen relaksasi sederhana sekaligus merawat wajahmu.',
+  General:
+    'Kamu bisa mulai dari Microdermabrasion, Hydra Peel, sampai totok wajah sesuai kebutuhan wajahmu.',
+};
+
+/* 3 reassurance lines (guardrail: results vary + suggest consultation). */
+const REASSURE_LINES: string[] = [
+  'Hasil bisa berbeda pada setiap orang, jadi sebaiknya konsultasi dulu supaya treatment-nya sesuai dengan kebutuhan wajahmu.',
+  'Setiap kulit punya kebutuhan yang berbeda, jadi enaknya konsultasi dulu sebelum menentukan treatment yang pas.',
+  'Karena kondisi kulit tiap orang berbeda, kami sarankan konsultasi dulu supaya treatment-nya benar-benar terasa sesuai untukmu.',
+];
+
+/* Treatment-specific scene direction for the video script (scenes 2 & 3). */
+const TREATMENT_SCRIPT: Record<
+  TreatmentType,
+  { scene2Visual: string; scene3Visual: string; scene3VO: string; overlay3: string }
+> = {
+  Microdermabrasion: {
+    scene2Visual:
+      'Close-up kulit wajah, lalu perlihatkan alat Microdermabrasion yang bersih dan siap dipakai.',
+    scene3Visual:
+      'Rekam proses Microdermabrasion mengangkat sel kulit mati secara perlahan; fokus ke gerakan alat di wajah.',
+    scene3VO:
+      'Microdermabrasion di DenanavBeauty Salon membantu wajah terasa lebih halus, dengan proses lembut yang dijelaskan dulu sebelum mulai.',
+    overlay3: 'Wajah terasa lebih halus',
+  },
+  'Hydra Peel': {
+    scene2Visual:
+      'Tampilkan tekstur cairan Hydra Peel dan suasana treatment room yang bersih dan rapi.',
+    scene3Visual:
+      'Rekam proses Hydra Peel membersihkan dan melembapkan kulit; tampilkan ekspresi customer yang rileks.',
+    scene3VO:
+      'Hydra Peel membantu membersihkan dan menjaga kelembapan kulit supaya wajah terasa lebih segar, dengan langkah yang nyaman.',
+    overlay3: 'Kulit terasa lebih segar',
+  },
+  'Totok wajah': {
+    scene2Visual:
+      'Tampilkan suasana tenang treatment room dan handuk bersih sebelum totok wajah dimulai.',
+    scene3Visual:
+      'Rekam gerakan totok wajah yang lembut dan menenangkan; fokus ke ekspresi rileks customer.',
+    scene3VO:
+      'Totok wajah jadi momen relaksasi yang membantu kamu merasa lebih rileks sekaligus merawat wajah.',
+    overlay3: 'Momen relaksasi untuk wajahmu',
+  },
+  General: {
+    scene2Visual:
+      'Tampilkan suasana salon yang bersih dan nyaman serta alat facial yang tertata rapi.',
+    scene3Visual:
+      'Perlihatkan proses facial treatment (Microdermabrasion, Hydra Peel, atau totok wajah) dengan pencahayaan terang dan lembut.',
+    scene3VO:
+      'Facial treatment di DenanavBeauty Salon membantu kulit terlihat lebih fresh dan bersih, dengan proses yang dijelaskan dulu sebelum dimulai.',
+    overlay3: 'Facial treatment yang nyaman & modern',
+  },
+};
+
+/* ============================================================
    MOCK GENERATOR — 30-Day Content Calendar
    ============================================================ */
 export function generateCalendar(
@@ -135,6 +234,12 @@ export function generateDetail(
   const pillar = row.pillar;
   const topic = row.topicTitle;
   const hook = row.hook;
+  const treatment = detectTreatment(topic + ' ' + hook);
+  const seed = variationSeed(topic);
+  const ts = TREATMENT_SCRIPT[treatment];
+  const body = CAPTION_BODIES[seed % CAPTION_BODIES.length];
+  const treatmentLine = TREATMENT_CAPTION_LINE[treatment];
+  const reassure = REASSURE_LINES[(seed + 1) % REASSURE_LINES.length];
 
   const intro =
     (
@@ -159,8 +264,11 @@ export function generateDetail(
     '. ' +
     intro +
     '\n\n' +
-    'Di DenanavBeauty Salon, facial treatment kami fokus membantu kulit terlihat lebih fresh dan bersih lewat Microdermabrasion, Hydra Peel, dan totok wajah. Setiap treatment dijelaskan dulu sebelum dimulai, jadi kamu bisa lebih tenang.\n\n' +
-    'Hasil bisa berbeda pada setiap orang, jadi sebaiknya konsultasi dulu supaya treatment-nya sesuai dengan kebutuhan wajahmu.\n\n' +
+    body +
+    (treatmentLine ? ' ' + treatmentLine : '') +
+    '\n\n' +
+    reassure +
+    '\n\n' +
     row.cta +
     (price ? '\nFacial treatment mulai ' + price + '.' : '') +
     '\n\n' +
@@ -182,20 +290,17 @@ export function generateDetail(
       {
         time: '4\u201310 dtk',
         visual:
-          'Tampilkan konteks: ' +
-          (pillar === 'Masalah & Solusi Kulit'
-            ? 'gambaran keluhan wajah secara halus.'
-            : 'suasana salon yang bersih dan nyaman.'),
+          pillar === 'Masalah & Solusi Kulit'
+            ? 'Tampilkan gambaran keluhan wajah secara halus tanpa berlebihan, lalu transisi ke suasana salon.'
+            : ts.scene2Visual,
         voiceover: intro,
         overlayText: 'Kenali dulu kebutuhan wajahmu',
       },
       {
         time: '11\u201320 dtk',
-        visual:
-          'Perlihatkan proses facial treatment (Microdermabrasion / Hydra Peel / totok wajah) dengan pencahayaan terang.',
-        voiceover:
-          'Facial treatment di DenanavBeauty Salon membantu kulit terlihat lebih fresh dan bersih, dengan proses yang dijelaskan dulu sebelum dimulai.',
-        overlayText: 'Facial treatment yang nyaman & modern',
+        visual: ts.scene3Visual,
+        voiceover: ts.scene3VO,
+        overlayText: ts.overlay3,
       },
       {
         time: '21\u201330 dtk',
@@ -217,7 +322,7 @@ export function generateDetail(
 
   const overlayOptions = [
     hook,
-    'Facial treatment yang nyaman & modern',
+    ts.overlay3,
     'Kenali dulu kebutuhan wajahmu',
     'Mulai ' + price,
     row.cta,
