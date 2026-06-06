@@ -19,6 +19,41 @@ import type {
   KolEntry,
 } from '@/types/content';
 
+/* ---------- Batch 2: Indonesian pillar/status normalization ----------
+ * Browsers from earlier versions may hold calendars/drafts/brand profiles
+ * saved with the old English pillar & status names. We normalize those on
+ * read so the UI only ever sees the new Bahasa Indonesia labels and nothing
+ * crashes. Unknown / custom values pass through untouched.
+ */
+const PILLAR_MIGRATION: Record<string, string> = {
+  'Facial Education': 'Edukasi Facial',
+  'Skin Concern & Solution': 'Masalah & Solusi Kulit',
+  'Treatment Experience': 'Pengalaman Treatment',
+  'Testimonial & Trust': 'Testimoni & Kepercayaan',
+  'Promo & Booking Awareness': 'Promo & Booking',
+};
+
+const STATUS_MIGRATION: Record<string, string> = {
+  Idea: 'Ide',
+  Planned: 'Direncanakan',
+  'In Production': 'Sedang Dibuat',
+  Posted: 'Sudah Diposting',
+};
+
+function normalizePillar(p: string): string {
+  return (p && PILLAR_MIGRATION[p]) || p;
+}
+function normalizeStatus(s: string): string {
+  return (s && STATUS_MIGRATION[s]) || s;
+}
+function normalizePillarText(text: string): string {
+  if (!text) return text;
+  return text
+    .split('\n')
+    .map((line) => PILLAR_MIGRATION[line.trim()] || line)
+    .join('\n');
+}
+
 function isBrowser(): boolean {
   return typeof window !== 'undefined' && !!window.localStorage;
 }
@@ -45,7 +80,11 @@ export function save<T>(key: string, val: T): boolean {
 
 /* ---------- Brand / Campaign / Calendar ---------- */
 export function getBrand(): BrandSnapshot | null {
-  return load<BrandSnapshot | null>(STORAGE_KEYS.brandSnapshot, null);
+  const b = load<BrandSnapshot | null>(STORAGE_KEYS.brandSnapshot, null);
+  if (b && typeof b.contentPillars === 'string') {
+    b.contentPillars = normalizePillarText(b.contentPillars);
+  }
+  return b;
 }
 export function saveBrand(data: BrandSnapshot): boolean {
   return save(STORAGE_KEYS.brandSnapshot, data);
@@ -59,7 +98,13 @@ export function saveCampaign(data: Campaign): boolean {
 }
 
 export function getCalendar(): ContentRow[] {
-  return load<ContentRow[]>(STORAGE_KEYS.contentCalendar, []);
+  const rows = load<ContentRow[]>(STORAGE_KEYS.contentCalendar, []);
+  if (!Array.isArray(rows)) return [];
+  return rows.map((r) => ({
+    ...r,
+    pillar: normalizePillar(r.pillar),
+    productionStatus: normalizeStatus(r.productionStatus),
+  }));
 }
 export function saveCalendar(rows: ContentRow[]): boolean {
   return save(STORAGE_KEYS.contentCalendar, rows);
@@ -91,7 +136,12 @@ export function saveKols(rows: KolEntry[]): boolean {
 
 /* ---------- Drafts ---------- */
 export function getDrafts(): DraftMap {
-  return load<DraftMap>(STORAGE_KEYS.contentDrafts, {}) || {};
+  const map = load<DraftMap>(STORAGE_KEYS.contentDrafts, {}) || {};
+  Object.keys(map).forEach((k) => {
+    const d = map[k];
+    if (d && typeof d.pillar === 'string') d.pillar = normalizePillar(d.pillar);
+  });
+  return map;
 }
 export function getDraft(id: string): ContentDraft | null {
   const s = getDrafts();

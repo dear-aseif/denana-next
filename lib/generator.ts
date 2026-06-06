@@ -67,7 +67,7 @@ export function generateCalendar(
   const rows: ContentRow[] = [];
   let liveUsed = false;
   for (let i = 0; i < 30; i++) {
-    const pillar = sequence[i] || 'Facial Education';
+    const pillar = sequence[i] || 'Edukasi Facial';
     const bank = TOPIC_BANK[pillar];
     const item = bank[topicCursor[pillar] % bank.length];
     topicCursor[pillar]++;
@@ -79,7 +79,7 @@ export function generateCalendar(
     if (i < 7) {
       format = FIRST_WEEK_FORMATS[i];
     }
-    if (!liveUsed && i === 17 && pillar === 'Treatment Experience') {
+    if (!liveUsed && i === 17 && pillar === 'Pengalaman Treatment') {
       format = 'Live';
       liveUsed = true;
     }
@@ -95,13 +95,13 @@ export function generateCalendar(
 
     // Objective mapping tuned for an Awareness campaign goal.
     let objective = 'Awareness';
-    if (pillar === 'Facial Education') objective = 'Awareness';
-    else if (pillar === 'Skin Concern & Solution')
+    if (pillar === 'Edukasi Facial') objective = 'Awareness';
+    else if (pillar === 'Masalah & Solusi Kulit')
       objective = i % 2 === 0 ? 'Awareness' : 'Engagement';
-    else if (pillar === 'Treatment Experience')
+    else if (pillar === 'Pengalaman Treatment')
       objective = i % 2 === 0 ? 'Engagement' : 'Trust';
-    else if (pillar === 'Testimonial & Trust') objective = 'Trust';
-    else if (pillar === 'Promo & Booking Awareness')
+    else if (pillar === 'Testimoni & Kepercayaan') objective = 'Trust';
+    else if (pillar === 'Promo & Booking')
       objective = i % 2 === 0 ? 'Booking' : 'Awareness';
 
     const ctaArr = CTA_BANK[pillar];
@@ -117,7 +117,7 @@ export function generateCalendar(
       hook: item.h,
       cta,
       objective,
-      productionStatus: 'Idea',
+      productionStatus: 'Ide',
     });
   }
   return rows;
@@ -139,15 +139,15 @@ export function generateDetail(
   const intro =
     (
       {
-        'Facial Education':
+        'Edukasi Facial':
           'Banyak yang masih bingung soal perawatan wajah. Lewat konten ini kita bahas pelan-pelan supaya lebih mudah dipahami.',
-        'Skin Concern & Solution':
+        'Masalah & Solusi Kulit':
           'Kondisi wajah seperti ini cukup umum dialami. Yuk pahami pelan-pelan tanpa perlu khawatir berlebihan.',
-        'Treatment Experience':
+        'Pengalaman Treatment':
           'Biar lebih tenang sebelum treatment, yuk intip bagaimana prosesnya berlangsung di DenanavBeauty Salon.',
-        'Testimonial & Trust':
+        'Testimoni & Kepercayaan':
           'Kenyamanan dan kepercayaan adalah hal yang kami jaga di setiap treatment.',
-        'Promo & Booking Awareness':
+        'Promo & Booking':
           'Kalau kamu lagi cari facial treatment yang nyaman di Kota Bima, ini bisa jadi awal yang pas.',
       } as Record<string, string>
     )[pillar] || '';
@@ -183,7 +183,7 @@ export function generateDetail(
         time: '4\u201310 dtk',
         visual:
           'Tampilkan konteks: ' +
-          (pillar === 'Skin Concern & Solution'
+          (pillar === 'Masalah & Solusi Kulit'
             ? 'gambaran keluhan wajah secara halus.'
             : 'suasana salon yang bersih dan nyaman.'),
         voiceover: intro,
@@ -211,7 +211,7 @@ export function generateDetail(
   const visualDirection =
     'Gaya clean minimal dengan nuansa putih dan sentuhan gold. Pencahayaan terang dan lembut, suasana salon yang tenang, bersih, dan elegan. ' +
     'Fokus pada kenyamanan: handuk bersih, alat tertata rapi, dan ekspresi customer yang rileks. Hindari kesan klinis atau menakutkan. ' +
-    (pillar === 'Treatment Experience'
+    (pillar === 'Pengalaman Treatment'
       ? 'Tampilkan langkah treatment secara halus dan menenangkan.'
       : 'Gunakan visual sederhana yang mudah direkam dengan smartphone.');
 
@@ -224,7 +224,7 @@ export function generateDetail(
   ];
 
   let tags = HASHTAG_BANK.slice(0, 10);
-  if (pillar === 'Promo & Booking Awareness')
+  if (pillar === 'Promo & Booking')
     tags = [
       '#DenanavBeautySalon',
       '#FacialBima',
@@ -237,7 +237,7 @@ export function generateDetail(
       '#kecantikan',
       '#facialmurah',
     ];
-  if (pillar === 'Treatment Experience')
+  if (pillar === 'Pengalaman Treatment')
     tags = [
       '#DenanavBeautySalon',
       '#FacialTreatment',
@@ -260,7 +260,7 @@ export function generateDetail(
     'Gunakan musik latar yang tenang dan lembut.',
     'Periksa ulang caption: hindari klaim medis & janji hasil pasti.',
   ];
-  if (pillar === 'Testimonial & Trust') {
+  if (pillar === 'Testimoni & Kepercayaan') {
     checklist.unshift(
       'Gunakan review customer asli dan minta izin sebelum menampilkan foto/video.',
     );

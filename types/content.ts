@@ -4,17 +4,17 @@
  */
 
 export type Pillar =
-  | 'Facial Education'
-  | 'Skin Concern & Solution'
-  | 'Treatment Experience'
-  | 'Testimonial & Trust'
-  | 'Promo & Booking Awareness';
+  | 'Edukasi Facial'
+  | 'Masalah & Solusi Kulit'
+  | 'Pengalaman Treatment'
+  | 'Testimoni & Kepercayaan'
+  | 'Promo & Booking';
 
 export type ContentFormat = 'Reels' | 'Carousel' | 'Single Post' | 'Stories' | 'Live';
 
 export type Objective = 'Awareness' | 'Engagement' | 'Trust' | 'Booking';
 
-export type ProductionStatus = 'Idea' | 'Planned' | 'In Production' | 'Posted';
+export type ProductionStatus = 'Ide' | 'Direncanakan' | 'Sedang Dibuat' | 'Sudah Diposting';
 
 /** Brand profile (Profil Brand). */
 export interface BrandSnapshot {

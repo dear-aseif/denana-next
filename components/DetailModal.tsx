@@ -132,14 +132,14 @@ export default function DetailModal({
     setSavedAt(new Date().toISOString());
     toast('Draft konten tersimpan 💾');
     onDraftSaved();
-    if (row.productionStatus === 'Idea') {
+    if (row.productionStatus === 'Ide') {
       if (
         window.confirm(
-          'Draft sudah tersimpan. Ubah status produksi konten ini dari "Idea" menjadi "Planned"?',
+          'Draft sudah tersimpan. Ubah status produksi konten ini dari "Ide" menjadi "Direncanakan"?',
         )
       ) {
-        onStatusChange(row.id, 'Planned');
-        toast('Status diubah ke Planned');
+        onStatusChange(row.id, 'Direncanakan');
+        toast('Status diubah ke Direncanakan');
       }
     }
   }

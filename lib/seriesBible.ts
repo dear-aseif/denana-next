@@ -15,27 +15,27 @@ import { lines } from './utils';
 
 /* Short descriptive library for the five known facial pillars. */
 const PILLAR_LIBRARY: Record<string, { goal: string; description: string }> = {
-  'Facial Education': {
+  'Edukasi Facial': {
     goal: 'Awareness & otoritas lewat edukasi ringan.',
     description:
       'Konten yang menjelaskan dasar perawatan wajah dan jenis facial treatment dengan bahasa sederhana, supaya audience merasa terbantu sebelum memutuskan treatment.',
   },
-  'Skin Concern & Solution': {
+  'Masalah & Solusi Kulit': {
     goal: 'Relevansi dengan keluhan nyata audience.',
     description:
       'Konten yang mengangkat keluhan kulit yang umum dialami (kusam, kasar, berminyak) lalu mengaitkannya dengan solusi facial treatment secara halus dan tidak menakut-nakuti.',
   },
-  'Treatment Experience': {
+  'Pengalaman Treatment': {
     goal: 'Trust lewat transparansi proses.',
     description:
       'Konten yang memperlihatkan suasana, proses, dan kebersihan treatment di salon agar calon customer merasa tenang dan tahu apa yang akan mereka alami.',
   },
-  'Testimonial & Trust': {
+  'Testimoni & Kepercayaan': {
     goal: 'Social proof & kredibilitas.',
     description:
       'Konten berisi cerita customer, FAQ, dan komitmen kebersihan untuk membangun kepercayaan calon customer baru.',
   },
-  'Promo & Booking Awareness': {
+  'Promo & Booking': {
     goal: 'Mendorong langkah konkret (konsultasi/booking).',
     description:
       'Konten yang mengajak audience mengambil langkah berikutnya: konsultasi, cek slot, atau booking facial treatment, tanpa terkesan memaksa.',
