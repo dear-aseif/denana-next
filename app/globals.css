@@ -535,7 +535,7 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold-soft);}
 
-/* ===== Phase 1.5A (rev) ��� Full-screen first-run onboarding ===== */
+/* ===== Phase 1.5A (rev) ����� Full-screen first-run onboarding ===== */
 .fr-screen{min-height:100vh;background:var(--notion-bg-soft);display:flex;flex-direction:column;align-items:center;padding:44px 18px 64px;}
 .fr-wrap{width:100%;max-width:680px;margin:0 auto;}
 .fr-brandbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:30px;}
@@ -562,7 +562,16 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 @keyframes fr-shimmer{0%{background-position:100% 0;}100%{background-position:0 0;}}
 @media(max-width:560px){.fr-cards{grid-template-columns:1fr;}.fr-title{font-size:22px;}}
 
-/* ===== Phase 1.5B — Campaign wizard review ringkas ===== */
+/* ===== Phase 1.5B (rev) — Campaign wizard focused layout ===== */
+.ob-wizard-wrap{max-width:800px;margin:0 auto;}
+.ob-option-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px;}
+.ob-option-grid-compact{grid-template-columns:repeat(3,1fr);}
+@media(max-width:640px){.ob-option-grid{grid-template-columns:1fr;}.ob-option-grid-compact{grid-template-columns:1fr;}}
+.ob-option-card{background:#fff;border:2px solid var(--notion-border-soft);border-radius:12px;padding:14px 16px;text-align:left;cursor:pointer;transition:all .18s ease;display:flex;flex-direction:column;gap:4px;font-family:inherit;width:100%;}
+.ob-option-card:hover{border-color:var(--gold-deep);background:var(--notion-bg-soft);}
+.ob-option-card.on{border-color:var(--gold-deep);background:var(--gold-bg);}
+.ob-option-label{font-weight:600;font-size:13.5px;color:var(--notion-text);display:flex;align-items:center;gap:7px;}
+.ob-option-hint{font-size:11.5px;color:var(--notion-text-soft);font-weight:400;margin-top:2px;}
 .ob-review{border:1px solid var(--notion-border-soft);border-radius:10px;background:var(--notion-bg-soft);padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
 .ob-review > div{display:flex;justify-content:space-between;gap:14px;font-size:13px;}
 .ob-review > div > span{color:var(--notion-text-soft);flex:0 0 auto;}

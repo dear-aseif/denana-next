@@ -173,7 +173,7 @@ export default function CampaignOnboarding({
   const barFillStyle: React.CSSProperties = { width: pct + '%' };
 
   return (
-    <section>
+    <section className="ob-wizard-wrap">
       <div className="card">
         {/* Progress indicator */}
         <div className="ob-progress">
@@ -188,18 +188,29 @@ export default function CampaignOnboarding({
           <div>
             <h3 style={headStyle}>Kapan campaign ini akan dijalankan?</h3>
             <p className="notion-muted" style={leadStyle}>Pilih momen yang paling sesuai.</p>
-            <div className="ob-choices">
+            <div className="ob-option-grid">
               {MOMENTS.map((m) => {
                 const on = moment === m.label;
                 return (
                   <button
                     type="button"
                     key={m.label}
-                    className={'ob-choice' + (on ? ' on' : '')}
+                    className={'ob-option-card' + (on ? ' on' : '')}
                     onClick={() => pickMoment(m.label)}
                   >
-                    {on ? <span className="ob-check">✓</span> : null}
-                    {m.label}
+                    <div className="ob-option-label">
+                      {on ? <span className="ob-check">✓</span> : null}
+                      {m.label}
+                    </div>
+                    {m.label !== 'Custom' && (
+                      <div className="ob-option-hint">
+                        {m.label === 'Campaign bulanan' && 'Konsistensi awareness'}
+                        {m.label === 'Ramadhan / Lebaran' && 'Momen musiman'}
+                        {m.label === 'Promo facial' && 'Mendorong booking'}
+                        {m.label === 'Edukasi facial' && 'Penjelasan treatment'}
+                        {m.label === 'Bangun kepercayaan customer' && 'Testimoni & hasil'}
+                      </div>
+                    )}
                   </button>
                 );
               })}
@@ -212,18 +223,20 @@ export default function CampaignOnboarding({
           <div>
             <h3 style={headStyle}>Apa tujuan utama campaign ini?</h3>
             <p className="notion-muted" style={leadStyle}>Pilih yang paling menggambarkan harapanmu.</p>
-            <div className="ob-choices">
+            <div className="ob-option-grid">
               {GOAL_OPTIONS.map((g) => {
                 const on = goal === g.label;
                 return (
                   <button
                     type="button"
                     key={g.label}
-                    className={'ob-choice' + (on ? ' on' : '')}
+                    className={'ob-option-card' + (on ? ' on' : '')}
                     onClick={() => setGoal(g.label)}
                   >
-                    {on ? <span className="ob-check">✓</span> : null}
-                    {g.label}
+                    <div className="ob-option-label">
+                      {on ? <span className="ob-check">✓</span> : null}
+                      {g.label}
+                    </div>
                   </button>
                 );
               })}
@@ -238,18 +251,20 @@ export default function CampaignOnboarding({
             <p className="notion-muted" style={leadStyle}>
               Durasi ini menentukan periode dan frekuensi kontenmu.
             </p>
-            <div className="ob-choices">
+            <div className="ob-option-grid ob-option-grid-compact">
               {DURATIONS.map((d) => {
                 const on = duration === d;
                 return (
                   <button
                     type="button"
                     key={d}
-                    className={'ob-choice' + (on ? ' on' : '')}
+                    className={'ob-option-card' + (on ? ' on' : '')}
                     onClick={() => setDuration(d)}
                   >
-                    {on ? <span className="ob-check">✓</span> : null}
-                    {d} hari
+                    <div className="ob-option-label">
+                      {on ? <span className="ob-check">✓</span> : null}
+                      {d} hari
+                    </div>
                   </button>
                 );
               })}
@@ -268,19 +283,21 @@ export default function CampaignOnboarding({
               Pilih saran di bawah atau tulis nama sendiri.
             </p>
             {current.names.length > 0 ? (
-              <div className="ob-choices">
+              <div className="ob-option-grid">
                 {current.names.map((n) => (
                   <button
                     type="button"
                     key={n}
-                    className={'ob-choice' + (campaignName === n ? ' on' : '')}
+                    className={'ob-option-card' + (campaignName === n ? ' on' : '')}
                     onClick={() => {
                       setCampaignName(n);
                       setNameEdited(true);
                     }}
                   >
-                    {campaignName === n ? <span className="ob-check">✓</span> : null}
-                    {n}
+                    <div className="ob-option-label">
+                      {campaignName === n ? <span className="ob-check">✓</span> : null}
+                      {n}
+                    </div>
                   </button>
                 ))}
               </div>
