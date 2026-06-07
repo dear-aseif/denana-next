@@ -125,17 +125,33 @@ const TREATMENT_SCRIPT: Record<
 /* ============================================================
    MOCK GENERATOR — 30-Day Content Calendar
    ============================================================ */
+/* Duration-based row count: derive the number of content days from the
+ * campaign period (periodStart..periodEnd inclusive). Falls back to 30 when
+ * the period is missing/invalid. 7-day -> 7 rows, 14-day -> 14, 30-day -> 30. */
+function campaignDayCount(campaign: Campaign | null): number {
+  if (campaign && campaign.periodStart && campaign.periodEnd) {
+    const s = new Date(campaign.periodStart + 'T00:00:00');
+    const e = new Date(campaign.periodEnd + 'T00:00:00');
+    if (!isNaN(s.getTime()) && !isNaN(e.getTime())) {
+      const diff = Math.round((e.getTime() - s.getTime()) / 86400000) + 1;
+      if (diff >= 1 && diff <= 60) return diff;
+    }
+  }
+  return 30;
+}
+
 export function generateCalendar(
   _brand: BrandSnapshot | null,
   campaign: Campaign | null,
 ): ContentRow[] {
+  const dayCount = campaignDayCount(campaign);
   const buckets = PILLAR_PLAN.map((p) => ({ pillar: p.pillar, n: p.count }));
   const sequence: string[] = [];
   const remaining = buckets.map((b) => b.n);
   const order = [0, 1, 2, 0, 1, 3, 0, 1, 4, 0]; // weighted cycle favoring education
   let oi = 0;
   let guard = 0;
-  while (sequence.length < 30 && guard < 500) {
+  while (sequence.length < dayCount && guard < 500) {
     guard++;
     const idx = order[oi % order.length];
     oi++;
@@ -165,7 +181,7 @@ export function generateCalendar(
 
   const rows: ContentRow[] = [];
   let liveUsed = false;
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < dayCount; i++) {
     const pillar = sequence[i] || 'Edukasi Facial';
     const bank = TOPIC_BANK[pillar];
     const item = bank[topicCursor[pillar] % bank.length];

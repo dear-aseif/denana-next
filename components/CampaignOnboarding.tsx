@@ -14,7 +14,7 @@
  */
 import React, { useState } from 'react';
 import type { Campaign, Objective } from '@/types/content';
-import { saveCampaign } from '@/lib/storage';
+import { createCampaign } from '@/lib/storage';
 import { useToast } from './ToastProvider';
 import Button from './Button';
 
@@ -142,7 +142,10 @@ export default function CampaignOnboarding({
       postingFrequency: '1 konten per hari selama ' + duration + ' hari',
       notes: current.note,
     };
-    saveCampaign(data);
+    // Create a NEW campaign record (never overwrite previous campaigns). The
+    // record is set active here because this is the user's explicit save on
+    // the final wizard step.
+    createCampaign(data, { setActive: true });
     toast('Rencana campaign tersimpan ✅');
     onComplete();
   }

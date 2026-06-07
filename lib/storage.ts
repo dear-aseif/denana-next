@@ -11,6 +11,8 @@ import { STORAGE_KEYS } from '@/data/sampleContent';
 import type {
   BrandSnapshot,
   Campaign,
+  CampaignRecord,
+  CampaignStatus,
   ContentRow,
   ContentDraft,
   DraftMap,
@@ -18,6 +20,7 @@ import type {
   CompetitorEntry,
   KolEntry,
 } from '@/types/content';
+import { uid } from './utils';
 
 /* ---------- Batch 2: Indonesian pillar/status normalization ----------
  * Browsers from earlier versions may hold calendars/drafts/brand profiles
@@ -90,15 +93,18 @@ export function saveBrand(data: BrandSnapshot): boolean {
   return save(STORAGE_KEYS.brandSnapshot, data);
 }
 
-export function getCampaign(): Campaign | null {
-  return load<Campaign | null>(STORAGE_KEYS.campaign, null);
-}
-export function saveCampaign(data: Campaign): boolean {
-  return save(STORAGE_KEYS.campaign, data);
-}
-
-export function getCalendar(): ContentRow[] {
-  const rows = load<ContentRow[]>(STORAGE_KEYS.contentCalendar, []);
+/* ---------- Phase 1.5: multiple campaign records ----------
+ * Campaigns now live as an array of CampaignRecord (each with its own
+ * calendar) under STORAGE_KEYS.campaigns, plus an activeCampaignId pointer.
+ * The legacy single keys (denana_campaign / denana_content_calendar) are
+ * migrated into this structure as the first record on first access and then
+ * left untouched (never deleted) so existing data is preserved.
+ *
+ * The classic helpers (getCampaign / saveCampaign / getCalendar /
+ * saveCalendar) keep their exact signatures and now read/write the ACTIVE
+ * campaign record, so every existing consumer keeps working unchanged.
+ */
+function normalizeRows(rows: ContentRow[]): ContentRow[] {
   if (!Array.isArray(rows)) return [];
   return rows.map((r) => ({
     ...r,
@@ -106,8 +112,149 @@ export function getCalendar(): ContentRow[] {
     productionStatus: normalizeStatus(r.productionStatus),
   }));
 }
+
+function ensureCampaignsMigrated(): void {
+  if (!isBrowser()) return;
+  // Already migrated if the new key exists (even as an empty array).
+  if (window.localStorage.getItem(STORAGE_KEYS.campaigns) !== null) return;
+
+  const oldCampaign = load<Campaign | null>(STORAGE_KEYS.campaign, null);
+  const oldCalendar = load<ContentRow[]>(STORAGE_KEYS.contentCalendar, []);
+  const records: CampaignRecord[] = [];
+  let activeId: string | null = null;
+
+  if (oldCampaign) {
+    const now = new Date().toISOString();
+    const rec: CampaignRecord = {
+      id: uid(),
+      campaign: oldCampaign,
+      calendar: Array.isArray(oldCalendar) ? oldCalendar : [],
+      createdAt: now,
+      updatedAt: now,
+      status: 'Aktif',
+    };
+    records.push(rec);
+    activeId = rec.id;
+  }
+
+  save(STORAGE_KEYS.campaigns, records);
+  save(STORAGE_KEYS.activeCampaignId, activeId);
+  // NOTE: legacy keys are intentionally kept (no data loss / safe rollback).
+}
+
+function applyActiveStatus(records: CampaignRecord[], activeId: string | null): CampaignRecord[] {
+  return records.map((r) => {
+    if (r.id === activeId) return r.status === 'Aktif' ? r : { ...r, status: 'Aktif' };
+    if (r.status === 'Aktif') return { ...r, status: 'Selesai' };
+    return r;
+  });
+}
+
+export function getCampaigns(): CampaignRecord[] {
+  ensureCampaignsMigrated();
+  const recs = load<CampaignRecord[]>(STORAGE_KEYS.campaigns, []);
+  if (!Array.isArray(recs)) return [];
+  return recs.map((r) => ({ ...r, calendar: normalizeRows(r.calendar) }));
+}
+
+function saveCampaigns(records: CampaignRecord[]): boolean {
+  return save(STORAGE_KEYS.campaigns, records);
+}
+
+export function getActiveCampaignId(): string | null {
+  ensureCampaignsMigrated();
+  return load<string | null>(STORAGE_KEYS.activeCampaignId, null);
+}
+
+export function getActiveCampaignRecord(): CampaignRecord | null {
+  const recs = getCampaigns();
+  if (recs.length === 0) return null;
+  const id = getActiveCampaignId();
+  if (id) {
+    const found = recs.find((r) => r.id === id);
+    if (found) return found;
+  }
+  return recs[0];
+}
+
+export function setActiveCampaignId(id: string | null): boolean {
+  ensureCampaignsMigrated();
+  const recs = getCampaigns();
+  saveCampaigns(applyActiveStatus(recs, id));
+  return save(STORAGE_KEYS.activeCampaignId, id);
+}
+
+/**
+ * Create a brand-new campaign record. Does NOT overwrite existing campaigns.
+ * By default the new record becomes active immediately (the wizard only calls
+ * this once the user saves on the final step).
+ */
+export function createCampaign(
+  data: Campaign,
+  opts?: { calendar?: ContentRow[]; status?: CampaignStatus; setActive?: boolean },
+): CampaignRecord {
+  ensureCampaignsMigrated();
+  const now = new Date().toISOString();
+  const rec: CampaignRecord = {
+    id: uid(),
+    campaign: data,
+    calendar: opts && opts.calendar ? opts.calendar : [],
+    createdAt: now,
+    updatedAt: now,
+    status: (opts && opts.status) || 'Aktif',
+  };
+  let recs = getCampaigns();
+  recs.push(rec);
+  const setActive = !opts || opts.setActive !== false;
+  if (setActive) recs = applyActiveStatus(recs, rec.id);
+  saveCampaigns(recs);
+  if (setActive) save(STORAGE_KEYS.activeCampaignId, rec.id);
+  return rec;
+}
+
+/* ---------- Classic helpers (now backed by the ACTIVE campaign record) ---------- */
+export function getCampaign(): Campaign | null {
+  const rec = getActiveCampaignRecord();
+  return rec ? rec.campaign : null;
+}
+
+/**
+ * Update the ACTIVE campaign's data. If no campaign exists yet (e.g. the manual
+ * form is used to create the very first campaign), a new active record is
+ * created so the historical "save creates a campaign" behavior still holds.
+ */
+export function saveCampaign(data: Campaign): boolean {
+  ensureCampaignsMigrated();
+  const recs = getCampaigns();
+  const id = getActiveCampaignId();
+  const now = new Date().toISOString();
+  const idx = id ? recs.findIndex((r) => r.id === id) : -1;
+  if (idx >= 0) {
+    recs[idx] = { ...recs[idx], campaign: data, updatedAt: now };
+    return saveCampaigns(recs);
+  }
+  createCampaign(data, { setActive: true });
+  return true;
+}
+
+export function getCalendar(): ContentRow[] {
+  const rec = getActiveCampaignRecord();
+  return rec ? normalizeRows(rec.calendar) : [];
+}
+
+/** Save calendar rows onto the ACTIVE campaign record. */
 export function saveCalendar(rows: ContentRow[]): boolean {
-  return save(STORAGE_KEYS.contentCalendar, rows);
+  ensureCampaignsMigrated();
+  const recs = getCampaigns();
+  const id = getActiveCampaignId();
+  const now = new Date().toISOString();
+  let idx = id ? recs.findIndex((r) => r.id === id) : -1;
+  if (idx < 0 && recs.length > 0) idx = 0;
+  if (idx >= 0) {
+    recs[idx] = { ...recs[idx], calendar: rows, updatedAt: now };
+    return saveCampaigns(recs);
+  }
+  return false;
 }
 
 /* ---------- Series Bible (Module 1.1) ---------- */
@@ -170,6 +317,8 @@ export function resetAllLocalData(): void {
     STORAGE_KEYS.seriesBible,
     STORAGE_KEYS.competitorAudit,
     STORAGE_KEYS.kolBrief,
+    STORAGE_KEYS.campaigns,
+    STORAGE_KEYS.activeCampaignId,
   ].forEach((k) => {
     try {
       window.localStorage.removeItem(k);

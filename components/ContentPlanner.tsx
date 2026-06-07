@@ -113,7 +113,7 @@ export default function ContentPlanner() {
     }
     const next = generateCalendar(brand, campaign);
     persist(next);
-    toast('30 konten berhasil dibuat ✨');
+    toast(next.length + ' konten berhasil dibuat ✨');
   }
 
   function regenCal() {

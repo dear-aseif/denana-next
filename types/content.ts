@@ -51,6 +51,23 @@ export interface Campaign {
   notes: string;
 }
 
+/** Simple lifecycle status for a stored campaign record. */
+export type CampaignStatus = 'Aktif' | 'Draft' | 'Selesai';
+
+/**
+ * Phase 1.5: a self-contained campaign record stored locally. Each record
+ * carries its own campaign data AND its own content calendar so multiple
+ * campaigns can coexist without overwriting one another.
+ */
+export interface CampaignRecord {
+  id: string;
+  campaign: Campaign;
+  calendar: ContentRow[];
+  createdAt: string;
+  updatedAt: string;
+  status: CampaignStatus;
+}
+
 /** A single row in the 30-day content calendar (Rencana Konten). */
 export interface ContentRow {
   id: string;

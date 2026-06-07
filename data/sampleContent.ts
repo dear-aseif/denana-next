@@ -28,6 +28,9 @@ export const STORAGE_KEYS = {
   seriesBible: 'denana_series_bible',
   competitorAudit: 'denana_competitor_audit',
   kolBrief: 'denana_kol_brief',
+  // Phase 1.5: multiple campaign records + active pointer.
+  campaigns: 'denana_campaigns',
+  activeCampaignId: 'denana_active_campaign_id',
 } as const;
 
 /* ---------- Defaults ---------- */
