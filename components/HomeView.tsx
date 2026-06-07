@@ -27,10 +27,10 @@ import {
   getCompetitors,
   getKols,
 } from '@/lib/storage';
-import { fmtDate } from '@/lib/utils';
 import Button from './Button';
 import Footer from './Footer';
 import StatusCard from './StatusCard';
+import CampaignSwitcherModal from './CampaignSwitcherModal';
 
 const sectionLabelStyle: React.CSSProperties = { marginBottom: 6, marginTop: 0 };
 const sectionDescStyle: React.CSSProperties = { marginTop: 0, marginBottom: 14 };
@@ -46,6 +46,7 @@ export default function HomeView() {
   const [bible, setBible] = useState<SeriesBible | null>(null);
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([]);
   const [kols, setKols] = useState<KolEntry[]>([]);
+  const [switcherOpen, setSwitcherOpen] = useState(false);
 
   function refresh() {
     setBrand(getBrand());
@@ -107,15 +108,9 @@ export default function HomeView() {
 
   function switchCampaign(id: string) {
     setActiveCampaignId(id);
+    setSwitcherOpen(false);
     refresh();
     if (typeof window !== 'undefined') window.scrollTo(0, 0);
-  }
-
-  function optionLabel(r: CampaignRecord): string {
-    const name = r.campaign.campaignName || 'Campaign tanpa nama';
-    const hasPeriod = !!(r.campaign.periodStart || r.campaign.periodEnd);
-    const period = hasPeriod ? fmtDate(r.campaign.periodStart) + '\u2013' + fmtDate(r.campaign.periodEnd) : 'Tanpa periode';
-    return name + ' · ' + period + ' · ' + r.status;
   }
 
   return (
@@ -133,18 +128,6 @@ export default function HomeView() {
           {/* 2. Active campaign card (with switcher when >1 campaign) */}
           <div className="card cc-panel">
             <p className="notion-eyebrow" style={sectionLabelStyle}>Campaign aktif</p>
-            {campaigns.length > 1 && (
-              <select
-                className="cc-switch-select"
-                value={activeId || ''}
-                onChange={(e) => switchCampaign(e.target.value)}
-                aria-label="Pilih campaign aktif"
-              >
-                {campaigns.map((r) => (
-                  <option key={r.id} value={r.id}>{optionLabel(r)}</option>
-                ))}
-              </select>
-            )}
             {hasCampaign && campaign ? (
               <>
                 <h3 style={panelHeadStyle}>{campaign.campaignName || 'Campaign tanpa nama'}</h3>
@@ -164,6 +147,9 @@ export default function HomeView() {
                 </div>
                 <div className="cc-panel-cta">
                   <Button href="/content-calendar">Lihat rencana konten →</Button>
+                  {campaigns.length > 1 && (
+                    <Button variant="secondary" onClick={() => setSwitcherOpen(true)}>Ganti campaign</Button>
+                  )}
                 </div>
               </>
             ) : (
@@ -285,6 +271,15 @@ export default function HomeView() {
       </section>
 
       <Footer />
+
+      {switcherOpen && campaigns.length > 0 && (
+        <CampaignSwitcherModal
+          campaigns={campaigns}
+          activeId={activeId}
+          onActivate={switchCampaign}
+          onClose={() => setSwitcherOpen(false)}
+        />
+      )}
     </>
   );
 }

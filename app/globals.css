@@ -535,7 +535,7 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold-soft);}
 
-/* ===== Phase 1.5A (rev) ����� Full-screen first-run onboarding ===== */
+/* ===== Phase 1.5A (rev) ������� Full-screen first-run onboarding ===== */
 .fr-screen{min-height:100vh;background:var(--notion-bg-soft);display:flex;flex-direction:column;align-items:center;padding:44px 18px 64px;}
 .fr-wrap{width:100%;max-width:680px;margin:0 auto;}
 .fr-brandbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:30px;}
@@ -1048,11 +1048,7 @@ section { margin-top: 22px; }
 }
 
 /* ===== Phase 1.5 - Campaign switcher / Daftar Campaign ===== */
-/* Switcher select on the Home active-campaign card */
-.cc-switch-select{width:100%;margin:2px 0 14px;padding:8px 10px;font-size:13px;border:1px solid var(--notion-border-soft);border-radius:8px;background:#fff;color:var(--notion-text);cursor:pointer;}
-.cc-switch-select:focus{outline:none;border-color:var(--gold-deep);}
-
-/* Daftar Campaign list (Rencana Campaign page) */
+/* Daftar Campaign list (Rencana Campaign page) + Pilih Campaign modal */
 .camp-list{display:flex;flex-direction:column;gap:10px;}
 .camp-item{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 15px;border:1px solid var(--notion-border-soft);border-radius:10px;background:#fff;}
 .camp-item.active{border-color:var(--gold-deep);background:var(--gold-bg);}
@@ -1066,3 +1062,7 @@ section { margin-top: 22px; }
 .camp-status.done{background:#eef1f6;color:#5b6472;}
 .camp-active-label{font-size:12.5px;font-weight:600;color:var(--gold-deep);white-space:nowrap;}
 @media(max-width:560px){.camp-item{flex-direction:column;align-items:stretch;}.camp-item-side{justify-content:space-between;}}
+
+/* Pilih Campaign modal (compact) */
+.modal.modal-sm{max-width:520px;}
+.modal.modal-sm .modal-body{max-height:60vh;}
