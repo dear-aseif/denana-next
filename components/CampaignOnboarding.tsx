@@ -208,7 +208,7 @@ export default function CampaignOnboarding({
                         {m.label === 'Ramadhan / Lebaran' && 'Momen musiman'}
                         {m.label === 'Promo facial' && 'Mendorong booking'}
                         {m.label === 'Edukasi facial' && 'Penjelasan treatment'}
-                        {m.label === 'Bangun kepercayaan customer' && 'Testimoni & hasil'}
+                        {m.label === 'Bangun kepercayaan customer' && 'Testimoni & rasa percaya'}
                       </div>
                     )}
                   </button>
