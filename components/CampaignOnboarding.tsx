@@ -1,17 +1,24 @@
 'use client';
 
 /*
- * CampaignOnboarding (Phase 1.5A — Guided first campaign)
- * A focused, friendly campaign setup used inside the full-screen first-run flow.
- * It maps simple choices (moment / goal / duration) onto the SAME Campaign
- * localStorage structure the dashboard already uses — it does not change the
- * Campaign data model, the generator, or any core function.
+ * CampaignOnboarding (Phase 1.5B rev — step-by-step campaign wizard)
+ * A true 5-step guided wizard: one decision per card, progress bar, back/next
+ * navigation, and disabled Continue until the required input is filled.
+ *
+ * Used in two places:
+ *  - FirstRunOnboarding (Phase 1.5A first-time flow)
+ *  - CampaignWizardClient (Phase 1.5B returning-user /campaign-setup page)
+ *
+ * The data contract is unchanged: saveCampaign() writes the SAME Campaign
+ * structure; the generator and all core functions are unmodified.
  */
 import React, { useState } from 'react';
 import type { Campaign, Objective } from '@/types/content';
 import { saveCampaign } from '@/lib/storage';
 import { useToast } from './ToastProvider';
 import Button from './Button';
+
+const TOTAL_STEPS = 5;
 
 type Moment = {
   label: string;
@@ -64,9 +71,15 @@ const DURATIONS = [7, 14, 30];
 
 const headStyle: React.CSSProperties = { marginTop: 0 };
 const leadStyle: React.CSSProperties = { marginTop: 0, marginBottom: 14 };
-const errStyle: React.CSSProperties = { color: '#c0561f', fontSize: 13, marginTop: 14, marginBottom: 0 };
+const hintTopStyle: React.CSSProperties = { marginTop: 10 };
+const fieldTopStyle: React.CSSProperties = { marginTop: 12 };
+const errStyle: React.CSSProperties = {
+  color: '#c0561f',
+  fontSize: 13,
+  marginTop: 14,
+  marginBottom: 0,
+};
 const navRowStyle: React.CSSProperties = { marginTop: 22 };
-const nameFieldStyle: React.CSSProperties = { marginTop: 4 };
 
 function toISO(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -75,8 +88,8 @@ function toISO(d: Date): string {
 export default function CampaignOnboarding({
   onComplete,
   title = 'Buat campaign pertamamu',
-  subtitle = 'Pilih saja yang paling cocok. Ini menentukan arah 30 ide konten yang akan dibuat.',
-  submitLabel = 'Simpan campaign →',
+  subtitle = 'Jawab beberapa pertanyaan singkat. Sistem akan bantu susun campaign-mu.',
+  submitLabel = 'Simpan campaign ✅',
 }: {
   onComplete: () => void;
   title?: string;
@@ -84,6 +97,8 @@ export default function CampaignOnboarding({
   submitLabel?: string;
 }) {
   const toast = useToast();
+
+  const [step, setStep] = useState(1);
   const [moment, setMoment] = useState<string>(MOMENTS[0].label);
   const [goal, setGoal] = useState<string>(GOAL_OPTIONS[0].label);
   const [duration, setDuration] = useState<number>(30);
@@ -93,14 +108,12 @@ export default function CampaignOnboarding({
 
   const current = MOMENTS.find((m) => m.label === moment) || MOMENTS[0];
 
-  // Live "review ringkas" values (also exactly what finish() will persist).
+  // Review date display — computed at render time for step 5.
   const reviewStart = new Date();
   const reviewEnd = new Date();
   reviewEnd.setDate(reviewEnd.getDate() + (duration - 1));
-  const periodStart = toISO(reviewStart);
-  const periodEnd = toISO(reviewEnd);
-  const reviewName = (campaignName || '').trim() || '(belum diisi)';
-  const reviewGoal = (GOAL_OPTIONS.find((g) => g.label === goal) || GOAL_OPTIONS[0]).label;
+  const reviewPeriodStart = toISO(reviewStart);
+  const reviewPeriodEnd = toISO(reviewEnd);
 
   function pickMoment(label: string) {
     setMoment(label);
@@ -112,7 +125,7 @@ export default function CampaignOnboarding({
     setErr('');
     const name = (campaignName || '').trim();
     if (!name) {
-      setErr('Beri nama campaign-nya dulu ya.');
+      setErr('Isi nama campaign-nya dulu ya.');
       return;
     }
     const goalObjective = (GOAL_OPTIONS.find((g) => g.label === goal) || GOAL_OPTIONS[0]).objective;
@@ -134,113 +147,209 @@ export default function CampaignOnboarding({
     onComplete();
   }
 
+  function next() {
+    setErr('');
+    if (step === 4 && !campaignName.trim()) {
+      setErr('Isi nama campaign-nya dulu ya.');
+      return;
+    }
+    if (step === TOTAL_STEPS) {
+      finish();
+      return;
+    }
+    setStep((s) => Math.min(TOTAL_STEPS, s + 1));
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
+  }
+
+  function back() {
+    setErr('');
+    setStep((s) => Math.max(1, s - 1));
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
+  }
+
+  const continueDisabled = step === 4 && !campaignName.trim();
+  const isLastStep = step === TOTAL_STEPS;
+  const pct = Math.round((step / TOTAL_STEPS) * 100);
+  const barFillStyle: React.CSSProperties = { width: pct + '%' };
+
   return (
     <section>
       <div className="card">
-        <h3 style={headStyle}>{title}</h3>
-        <p className="notion-muted" style={leadStyle}>{subtitle}</p>
-
-        <div className="ob-group">
-          <h4>Momen campaign</h4>
-          <div className="ob-choices">
-            {MOMENTS.map((m) => (
-              <button
-                type="button"
-                key={m.label}
-                className={'ob-choice' + (moment === m.label ? ' on' : '')}
-                onClick={() => pickMoment(m.label)}
-              >
-                {moment === m.label ? <span className="ob-check">✓</span> : null}
-                {m.label}
-              </button>
-            ))}
+        {/* Progress indicator */}
+        <div className="ob-progress">
+          <div className="ob-bar">
+            <div className="ob-bar-fill" style={barFillStyle} />
           </div>
+          <span className="ob-progress-label">Langkah {step} dari {TOTAL_STEPS}</span>
         </div>
 
-        <div className="ob-group">
-          <h4>Tujuan campaign</h4>
-          <div className="ob-choices">
-            {GOAL_OPTIONS.map((g) => (
-              <button
-                type="button"
-                key={g.label}
-                className={'ob-choice' + (goal === g.label ? ' on' : '')}
-                onClick={() => setGoal(g.label)}
-              >
-                {goal === g.label ? <span className="ob-check">✓</span> : null}
-                {g.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="ob-group">
-          <h4>Durasi</h4>
-          <div className="ob-choices">
-            {DURATIONS.map((d) => (
-              <button
-                type="button"
-                key={d}
-                className={'ob-choice' + (duration === d ? ' on' : '')}
-                onClick={() => setDuration(d)}
-              >
-                {duration === d ? <span className="ob-check">✓</span> : null}
-                {d} hari
-              </button>
-            ))}
-          </div>
-          <p className="hint">Rencana konten tetap berisi 30 ide siap pakai.</p>
-        </div>
-
-        <div className="ob-group">
-          <h4>Nama campaign</h4>
-          {current.names.length > 0 ? (
+        {/* ---- Step 1: Momen ---- */}
+        {step === 1 && (
+          <div>
+            <h3 style={headStyle}>Kapan campaign ini akan dijalankan?</h3>
+            <p className="notion-muted" style={leadStyle}>Pilih momen yang paling sesuai.</p>
             <div className="ob-choices">
-              {current.names.map((n) => (
-                <button
-                  type="button"
-                  key={n}
-                  className={'ob-choice' + (campaignName === n ? ' on' : '')}
-                  onClick={() => {
-                    setCampaignName(n);
-                    setNameEdited(true);
-                  }}
-                >
-                  {campaignName === n ? <span className="ob-check">✓</span> : null}
-                  {n}
-                </button>
-              ))}
+              {MOMENTS.map((m) => {
+                const on = moment === m.label;
+                return (
+                  <button
+                    type="button"
+                    key={m.label}
+                    className={'ob-choice' + (on ? ' on' : '')}
+                    onClick={() => pickMoment(m.label)}
+                  >
+                    {on ? <span className="ob-check">✓</span> : null}
+                    {m.label}
+                  </button>
+                );
+              })}
             </div>
-          ) : null}
-          <div className="field full" style={nameFieldStyle}>
-            <input
-              type="text"
-              value={campaignName}
-              onChange={(e) => {
-                setCampaignName(e.target.value);
-                setNameEdited(true);
-              }}
-              placeholder="Contoh: Facial Awareness Campaign"
-            />
-            <p className="hint">Pilih salah satu saran di atas atau tulis nama sendiri.</p>
           </div>
-        </div>
+        )}
 
-        <div className="ob-group">
-          <h4>Review ringkas</h4>
-          <div className="ob-review">
-            <div><span>Nama</span><strong>{reviewName}</strong></div>
-            <div><span>Momen</span><strong>{moment}</strong></div>
-            <div><span>Tujuan</span><strong>{reviewGoal}</strong></div>
-            <div><span>Durasi</span><strong>{duration} hari ({periodStart} – {periodEnd})</strong></div>
-            <div><span>Posting</span><strong>1 konten per hari selama {duration} hari</strong></div>
+        {/* ---- Step 2: Tujuan ---- */}
+        {step === 2 && (
+          <div>
+            <h3 style={headStyle}>Apa tujuan utama campaign ini?</h3>
+            <p className="notion-muted" style={leadStyle}>Pilih yang paling menggambarkan harapanmu.</p>
+            <div className="ob-choices">
+              {GOAL_OPTIONS.map((g) => {
+                const on = goal === g.label;
+                return (
+                  <button
+                    type="button"
+                    key={g.label}
+                    className={'ob-choice' + (on ? ' on' : '')}
+                    onClick={() => setGoal(g.label)}
+                  >
+                    {on ? <span className="ob-check">✓</span> : null}
+                    {g.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* ---- Step 3: Durasi ---- */}
+        {step === 3 && (
+          <div>
+            <h3 style={headStyle}>Berapa lama campaign ini berjalan?</h3>
+            <p className="notion-muted" style={leadStyle}>
+              Durasi ini menentukan periode dan frekuensi kontenmu.
+            </p>
+            <div className="ob-choices">
+              {DURATIONS.map((d) => {
+                const on = duration === d;
+                return (
+                  <button
+                    type="button"
+                    key={d}
+                    className={'ob-choice' + (on ? ' on' : '')}
+                    onClick={() => setDuration(d)}
+                  >
+                    {on ? <span className="ob-check">✓</span> : null}
+                    {d} hari
+                  </button>
+                );
+              })}
+            </div>
+            <p className="hint" style={hintTopStyle}>
+              Untuk campaign bulanan, 30 hari biasanya paling ideal.
+            </p>
+          </div>
+        )}
+
+        {/* ---- Step 4: Nama campaign ---- */}
+        {step === 4 && (
+          <div>
+            <h3 style={headStyle}>Beri nama campaign ini</h3>
+            <p className="notion-muted" style={leadStyle}>
+              Pilih saran di bawah atau tulis nama sendiri.
+            </p>
+            {current.names.length > 0 ? (
+              <div className="ob-choices">
+                {current.names.map((n) => (
+                  <button
+                    type="button"
+                    key={n}
+                    className={'ob-choice' + (campaignName === n ? ' on' : '')}
+                    onClick={() => {
+                      setCampaignName(n);
+                      setNameEdited(true);
+                    }}
+                  >
+                    {campaignName === n ? <span className="ob-check">✓</span> : null}
+                    {n}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            <div className="field full" style={fieldTopStyle}>
+              <input
+                type="text"
+                value={campaignName}
+                onChange={(e) => {
+                  setCampaignName(e.target.value);
+                  setNameEdited(true);
+                }}
+                placeholder="Contoh: Facial Awareness Campaign"
+              />
+              {current.names.length > 0 ? (
+                <p className="hint">Pilih salah satu saran di atas atau tulis nama sendiri.</p>
+              ) : (
+                <p className="hint">Tulis nama campaign yang kamu inginkan.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ---- Step 5: Review sebelum disimpan ---- */}
+        {step === 5 && (
+          <div>
+            <h3 style={headStyle}>Cek dulu sebelum disimpan</h3>
+            <p className="notion-muted" style={leadStyle}>Pastikan semua sudah sesuai.</p>
+            <div className="ob-review">
+              <div>
+                <span>Nama campaign</span>
+                <strong>{(campaignName || '').trim() || '(belum diisi)'}</strong>
+              </div>
+              <div>
+                <span>Momen</span>
+                <strong>{moment}</strong>
+              </div>
+              <div>
+                <span>Tujuan</span>
+                <strong>{goal}</strong>
+              </div>
+              <div>
+                <span>Durasi</span>
+                <strong>{duration} hari</strong>
+              </div>
+              <div>
+                <span>Periode</span>
+                <strong>{reviewPeriodStart} – {reviewPeriodEnd}</strong>
+              </div>
+              <div>
+                <span>Frekuensi posting</span>
+                <strong>1 konten/hari selama {duration} hari</strong>
+              </div>
+            </div>
+          </div>
+        )}
 
         {err ? <p style={errStyle}>{err}</p> : null}
 
+        {/* Navigation */}
         <div className="btn-row" style={navRowStyle}>
-          <Button onClick={finish}>{submitLabel}</Button>
+          {step > 1 ? (
+            <Button variant="ghost" onClick={back}>
+              ← Kembali
+            </Button>
+          ) : null}
+          <Button onClick={next} disabled={continueDisabled}>
+            {isLastStep ? submitLabel : 'Lanjut →'}
+          </Button>
         </div>
       </div>
     </section>
