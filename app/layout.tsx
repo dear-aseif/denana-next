@@ -7,8 +7,8 @@ import type { Metadata } from 'next';
 import React from 'react';
 import './globals.css';
 import ToastProvider from '@/components/ToastProvider';
-import Header from '@/components/Header';
 import RouteBodyClass from '@/components/RouteBodyClass';
+import AppFrame from '@/components/AppFrame';
 
 export const metadata: Metadata = {
   title: 'Denana Social Growth OS',
@@ -22,10 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ToastProvider>
           <RouteBodyClass />
-          <div className="app-layout">
-            <Header />
-            <div className="app-content">{children}</div>
-          </div>
+          <AppFrame>{children}</AppFrame>
         </ToastProvider>
       </body>
     </html>

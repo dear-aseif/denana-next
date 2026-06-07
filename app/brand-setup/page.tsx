@@ -1,11 +1,11 @@
 import React from 'react';
 import Shell from '@/components/Shell';
-import BrandForm from '@/components/BrandForm';
+import BrandSetupClient from '@/components/BrandSetupClient';
 
 export default function BrandSetupPage() {
   return (
     <Shell>
-      <BrandForm />
+      <BrandSetupClient />
     </Shell>
   );
 }

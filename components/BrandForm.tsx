@@ -75,11 +75,12 @@ export default function BrandForm() {
   return (
     <>
       <section className="page-head">
-        <span className="notion-eyebrow">Langkah 1</span>
-        <h1>Profil Brand</h1>
+        <span className="notion-eyebrow">Profil</span>
+        <h1>Pengaturan Profil Salon</h1>
         <p>
-          Tinjau dan simpan profil DenanavBeauty Salon. Data ini dipakai untuk
-          membuat rencana konten dan caption. Tersimpan otomatis di perangkat ini.
+          Ubah dan simpan detail profil DenanavBeauty Salon kapan saja. Data ini
+          dipakai untuk membuat rencana konten dan caption. Tersimpan otomatis di
+          perangkat ini.
         </p>
       </section>
       <section>

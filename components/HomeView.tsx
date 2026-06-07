@@ -60,16 +60,28 @@ export default function HomeView() {
         </p>
       </section>
 
-      {!hasBrand ? (
+      {hasBrand && !hasCampaign ? (
         <section>
           <div className="card">
             <EmptyState
-              big="💎"
-              title="Mulai dari Profil Brand"
-              action={<Button href="/brand-setup">Isi Profil Brand →</Button>}
+              big="📅"
+              title="Lanjutkan: buat campaign pertama"
+              action={<Button href="/campaign-setup">Buat campaign pertama →</Button>}
             >
-              Lengkapi profil brand DenanavBeauty Salon dulu untuk mulai membuat
-              rencana konten 30 hari.
+              Profil usaha sudah siap. Sekarang buat rencana campaign pertama untuk
+              mulai menyusun konten.
+            </EmptyState>
+          </div>
+        </section>
+      ) : hasBrand && hasCampaign && !hasCalendar ? (
+        <section>
+          <div className="card">
+            <EmptyState
+              big="🗓️"
+              title="Lanjutkan: buat rencana konten"
+              action={<Button href="/content-calendar">Buat rencana konten →</Button>}
+            >
+              Campaign sudah siap. Buat 30 ide konten siap pakai dari campaign ini.
             </EmptyState>
           </div>
         </section>

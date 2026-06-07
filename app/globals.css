@@ -535,6 +535,49 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold-soft);}
 
+/* ===== Phase 1.5A (rev) — Full-screen first-run onboarding ===== */
+.fr-screen{min-height:100vh;background:var(--notion-bg-soft);display:flex;flex-direction:column;align-items:center;padding:44px 18px 64px;}
+.fr-wrap{width:100%;max-width:680px;margin:0 auto;}
+.fr-brandbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:30px;}
+.fr-brandbar .fr-logo{font-size:20px;}
+.fr-brandbar .fr-logo-text{font-weight:700;letter-spacing:.2px;color:var(--notion-text);}
+.fr-center{text-align:center;}
+.fr-title{margin:0 0 8px;font-size:26px;line-height:1.25;}
+.fr-sub{margin:0 auto 4px;max-width:520px;color:var(--notion-text-soft);}
+.fr-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:28px 0 24px;}
+.fr-card{background:#fff;border:1px solid var(--notion-border-soft);border-radius:14px;padding:20px 14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.fr-card .fr-ic{font-size:26px;line-height:1;}
+.fr-card .fr-t{font-weight:600;font-size:13px;color:var(--notion-text);}
+.fr-cta{margin-top:10px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.fr-confirm{text-align:center;margin-top:14px;}
+.fr-big{font-size:40px;margin-bottom:6px;}
+.fr-loading{text-align:center;padding:56px 16px;}
+.fr-loading-text{margin:18px 0 22px;font-weight:600;color:var(--notion-text);}
+.fr-spinner{width:38px;height:38px;margin:0 auto;border-radius:50%;border:3px solid var(--notion-border-soft);border-top-color:var(--gold-deep);animation:fr-spin .8s linear infinite;}
+@keyframes fr-spin{to{transform:rotate(360deg);}}
+.fr-skel-list{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:10px;}
+.fr-skel{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--notion-bg-soft) 25%,var(--notion-border-soft) 37%,var(--notion-bg-soft) 63%);background-size:400% 100%;animation:fr-shimmer 1.3s ease infinite;}
+.fr-skel:nth-child(2){width:85%;margin:0 auto;}
+.fr-skel:nth-child(3){width:70%;margin:0 auto;}
+@keyframes fr-shimmer{0%{background-position:100% 0;}100%{background-position:0 0;}}
+@media(max-width:560px){.fr-cards{grid-template-columns:1fr;}.fr-title{font-size:22px;}}
+
+/* ===== Phase 1.5A — Guided brand onboarding ===== */
+.ob-progress{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
+.ob-bar{flex:1;height:7px;border-radius:999px;background:var(--notion-border-soft);overflow:hidden;}
+.ob-bar-fill{height:100%;background:var(--gold-deep);border-radius:999px;transition:width .28s ease;}
+.ob-progress-label{font-size:12px;font-weight:600;color:var(--notion-text-faint);white-space:nowrap;}
+.ob-choices{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px;}
+.ob-choice{font-size:13px;font-weight:600;line-height:1.2;padding:9px 15px;border-radius:999px;background:var(--notion-bg-soft);color:var(--notion-text-soft);border:1px solid var(--notion-border-soft);cursor:pointer;transition:background .15s,border-color .15s,color .15s;}
+.ob-choice:hover{border-color:var(--gold-deep);color:var(--notion-text);}
+.ob-choice.on{background:var(--gold-bg);color:var(--gold-deep);border-color:var(--gold-deep);}
+.ob-choice .ob-check{margin-right:6px;font-weight:700;}
+.ob-group{margin-top:18px;}
+.ob-group h4{margin:0 0 9px;font-size:13px;}
+.ob-success{text-align:center;padding:34px 20px;}
+.ob-success .big{font-size:42px;margin-bottom:6px;}
+.ob-success p{max-width:460px;margin:8px auto 0;}
+
 /* ---- Empty state ---- */
 .empty{text-align:center;padding:46px 20px;border:1px dashed var(--notion-border);border-radius:var(--notion-radius);background:var(--notion-bg-soft);}
 .empty .big{font-size:34px;margin-bottom:8px;}
