@@ -1046,3 +1046,23 @@ section { margin-top: 22px; }
   .cc-next{align-items:stretch;}
   .cc-stats{grid-template-columns:repeat(2,1fr);}
 }
+
+/* ===== Phase 1.5 - Campaign switcher / Daftar Campaign ===== */
+/* Switcher select on the Home active-campaign card */
+.cc-switch-select{width:100%;margin:2px 0 14px;padding:8px 10px;font-size:13px;border:1px solid var(--notion-border-soft);border-radius:8px;background:#fff;color:var(--notion-text);cursor:pointer;}
+.cc-switch-select:focus{outline:none;border-color:var(--gold-deep);}
+
+/* Daftar Campaign list (Rencana Campaign page) */
+.camp-list{display:flex;flex-direction:column;gap:10px;}
+.camp-item{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 15px;border:1px solid var(--notion-border-soft);border-radius:10px;background:#fff;}
+.camp-item.active{border-color:var(--gold-deep);background:var(--gold-bg);}
+.camp-item-main{min-width:0;}
+.camp-item-name{margin:0;font-size:14px;font-weight:600;color:var(--notion-text);}
+.camp-item-meta{margin:2px 0 0;font-size:12px;color:var(--notion-text-soft);}
+.camp-item-side{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.camp-status{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+.camp-status.ok{background:#eef7ef;color:#3c7a45;}
+.camp-status.warn{background:#fdf3e3;color:#a8841f;}
+.camp-status.done{background:#eef1f6;color:#5b6472;}
+.camp-active-label{font-size:12.5px;font-weight:600;color:var(--gold-deep);white-space:nowrap;}
+@media(max-width:560px){.camp-item{flex-direction:column;align-items:stretch;}.camp-item-side{justify-content:space-between;}}

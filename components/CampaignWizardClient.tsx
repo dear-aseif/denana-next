@@ -15,9 +15,10 @@
  */
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getBrand, getCampaign, saveCalendar } from '@/lib/storage';
+import { getBrand, getCampaign, getCampaigns, saveCalendar } from '@/lib/storage';
 import { generateCalendar } from '@/lib/generator';
 import CampaignOnboarding from './CampaignOnboarding';
+import CampaignList from './CampaignList';
 import CampaignForm from './CampaignForm';
 import Button from './Button';
 import Footer from './Footer';
@@ -37,6 +38,7 @@ const manualLink: React.CSSProperties = {
   cursor: 'pointer',
 };
 const backRow: React.CSSProperties = { marginTop: 18 };
+const safetyCopyStyle: React.CSSProperties = { marginTop: 10, fontSize: 13 };
 
 export default function CampaignWizardClient() {
   const router = useRouter();
@@ -99,6 +101,7 @@ export default function CampaignWizardClient() {
 
   /* ---------- Saved — next-step confirmation ---------- */
   if (phase === 'saved') {
+    const hasPrevious = getCampaigns().length > 1;
     return (
       <>
         <section className="page-head">
@@ -113,6 +116,11 @@ export default function CampaignWizardClient() {
               <p className="notion-muted">
                 Campaign berhasil disimpan. Mau langsung buat rencana konten?
               </p>
+              {hasPrevious && (
+                <p className="notion-muted" style={safetyCopyStyle}>
+                  Campaign baru berhasil dibuat. Campaign sebelumnya tetap tersimpan dan bisa dibuka lagi dari Daftar Campaign.
+                </p>
+              )}
               <div className="btn-row" style={confirmBtnRow}>
                 <Button onClick={() => setPhase('generating')}>Ya, buat rencana konten</Button>
                 <Button variant="ghost" onClick={() => router.push('/')}>
@@ -153,6 +161,8 @@ export default function CampaignWizardClient() {
           </a>
         </div>
       </section>
+
+      <CampaignList />
 
       <Footer />
     </>

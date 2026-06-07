@@ -1,24 +1,33 @@
 'use client';
 
 /*
- * HomeView - Phase 1.5C: Home Command Center
+ * HomeView - Phase 1.5C: Home Command Center (+ campaign switcher)
  * A practical command center for the salon owner/staff. It answers, from one
  * place: which campaign is active, how far content has progressed, what the
  * next step is, and which button to click.
  *
- * Sections (in order):
- *   1. Hero / greeting
- *   2. Active campaign card  +  3. Content progress summary  (side by side)
- *   4. Next step card (the obvious main CTA)
- *   5. Core flow cards (secondary): Profil Salon / Rencana Campaign / Rencana Konten
- *   6. Tools Pendukung (clearly secondary, lower on the page)
+ * Phase 1.5 switcher: when more than one campaign exists, a small select in
+ * the Active Campaign card lets the user switch the active campaign. Switching
+ * updates denana_active_campaign_id and re-reads all derived state so the
+ * card, the period, and the content-progress counts reflect the selection.
  *
  * No data-structure changes; everything is derived by reading existing
  * localStorage state and counting existing calendar rows.
  */
 import React, { useEffect, useState } from 'react';
-import type { BrandSnapshot, Campaign, ContentRow, SeriesBible, CompetitorEntry, KolEntry } from '@/types/content';
-import { getBrand, getCampaign, getCalendar, getSeriesBible, getCompetitors, getKols } from '@/lib/storage';
+import type { BrandSnapshot, Campaign, CampaignRecord, ContentRow, SeriesBible, CompetitorEntry, KolEntry } from '@/types/content';
+import {
+  getBrand,
+  getCampaign,
+  getCalendar,
+  getCampaigns,
+  getActiveCampaignId,
+  setActiveCampaignId,
+  getSeriesBible,
+  getCompetitors,
+  getKols,
+} from '@/lib/storage';
+import { fmtDate } from '@/lib/utils';
 import Button from './Button';
 import Footer from './Footer';
 import StatusCard from './StatusCard';
@@ -26,24 +35,31 @@ import StatusCard from './StatusCard';
 const sectionLabelStyle: React.CSSProperties = { marginBottom: 6, marginTop: 0 };
 const sectionDescStyle: React.CSSProperties = { marginTop: 0, marginBottom: 14 };
 const panelHeadStyle: React.CSSProperties = { marginTop: 8, marginBottom: 14 };
-const panelLeadStyle: React.CSSProperties = { marginTop: 0, marginBottom: 16 };
 
 export default function HomeView() {
   const [mounted, setMounted] = useState(false);
   const [brand, setBrand] = useState<BrandSnapshot | null>(null);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [calendar, setCalendar] = useState<ContentRow[]>([]);
+  const [campaigns, setCampaigns] = useState<CampaignRecord[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [bible, setBible] = useState<SeriesBible | null>(null);
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([]);
   const [kols, setKols] = useState<KolEntry[]>([]);
 
-  useEffect(() => {
+  function refresh() {
     setBrand(getBrand());
     setCampaign(getCampaign());
     setCalendar(getCalendar());
+    setCampaigns(getCampaigns());
+    setActiveId(getActiveCampaignId());
     setBible(getSeriesBible());
     setCompetitors(getCompetitors());
     setKols(getKols());
+  }
+
+  useEffect(() => {
+    refresh();
     setMounted(true);
   }, []);
 
@@ -89,6 +105,19 @@ export default function HomeView() {
     { key: 'diposting', label: 'Sudah Diposting', value: counts.sudahDiposting },
   ];
 
+  function switchCampaign(id: string) {
+    setActiveCampaignId(id);
+    refresh();
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
+  }
+
+  function optionLabel(r: CampaignRecord): string {
+    const name = r.campaign.campaignName || 'Campaign tanpa nama';
+    const hasPeriod = !!(r.campaign.periodStart || r.campaign.periodEnd);
+    const period = hasPeriod ? fmtDate(r.campaign.periodStart) + '\u2013' + fmtDate(r.campaign.periodEnd) : 'Tanpa periode';
+    return name + ' · ' + period + ' · ' + r.status;
+  }
+
   return (
     <>
       {/* ---- 1. Hero / greeting ---- */}
@@ -101,9 +130,21 @@ export default function HomeView() {
       {/* ---- 2 + 3. Active campaign  &  Content progress ---- */}
       <section>
         <div className="grid grid-2">
-          {/* 2. Active campaign card */}
+          {/* 2. Active campaign card (with switcher when >1 campaign) */}
           <div className="card cc-panel">
             <p className="notion-eyebrow" style={sectionLabelStyle}>Campaign aktif</p>
+            {campaigns.length > 1 && (
+              <select
+                className="cc-switch-select"
+                value={activeId || ''}
+                onChange={(e) => switchCampaign(e.target.value)}
+                aria-label="Pilih campaign aktif"
+              >
+                {campaigns.map((r) => (
+                  <option key={r.id} value={r.id}>{optionLabel(r)}</option>
+                ))}
+              </select>
+            )}
             {hasCampaign && campaign ? (
               <>
                 <h3 style={panelHeadStyle}>{campaign.campaignName || 'Campaign tanpa nama'}</h3>
