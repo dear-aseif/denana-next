@@ -1,11 +1,11 @@
 import React from 'react';
 import Shell from '@/components/Shell';
-import CampaignForm from '@/components/CampaignForm';
+import CampaignWizardClient from '@/components/CampaignWizardClient';
 
 export default function CampaignSetupPage() {
   return (
     <Shell>
-      <CampaignForm />
+      <CampaignWizardClient />
     </Shell>
   );
 }

@@ -535,7 +535,7 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold-soft);}
 
-/* ===== Phase 1.5A (rev) — Full-screen first-run onboarding ===== */
+/* ===== Phase 1.5A (rev) ��� Full-screen first-run onboarding ===== */
 .fr-screen{min-height:100vh;background:var(--notion-bg-soft);display:flex;flex-direction:column;align-items:center;padding:44px 18px 64px;}
 .fr-wrap{width:100%;max-width:680px;margin:0 auto;}
 .fr-brandbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:30px;}
@@ -561,6 +561,12 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .fr-skel:nth-child(3){width:70%;margin:0 auto;}
 @keyframes fr-shimmer{0%{background-position:100% 0;}100%{background-position:0 0;}}
 @media(max-width:560px){.fr-cards{grid-template-columns:1fr;}.fr-title{font-size:22px;}}
+
+/* ===== Phase 1.5B — Campaign wizard review ringkas ===== */
+.ob-review{border:1px solid var(--notion-border-soft);border-radius:10px;background:var(--notion-bg-soft);padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
+.ob-review > div{display:flex;justify-content:space-between;gap:14px;font-size:13px;}
+.ob-review > div > span{color:var(--notion-text-soft);flex:0 0 auto;}
+.ob-review > div > strong{color:var(--notion-text);text-align:right;font-weight:600;}
 
 /* ===== Phase 1.5A — Guided brand onboarding ===== */
 .ob-progress{display:flex;align-items:center;gap:12px;margin-bottom:22px;}

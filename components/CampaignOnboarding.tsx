@@ -55,8 +55,9 @@ const MOMENTS: Moment[] = [
 const GOAL_OPTIONS: Array<{ label: string; objective: Objective }> = [
   { label: 'Biar orang tahu Denana', objective: 'Awareness' },
   { label: 'Biar orang paham manfaat facial', objective: 'Engagement' },
-  { label: 'Biar orang mulai tanya harga', objective: 'Trust' },
+  { label: 'Biar orang mulai tanya harga', objective: 'Engagement' },
   { label: 'Biar orang booking treatment', objective: 'Booking' },
+  { label: 'Biar customer lama datang lagi', objective: 'Trust' },
 ];
 
 const DURATIONS = [7, 14, 30];
@@ -71,7 +72,17 @@ function toISO(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-export default function CampaignOnboarding({ onComplete }: { onComplete: () => void }) {
+export default function CampaignOnboarding({
+  onComplete,
+  title = 'Buat campaign pertamamu',
+  subtitle = 'Pilih saja yang paling cocok. Ini menentukan arah 30 ide konten yang akan dibuat.',
+  submitLabel = 'Simpan campaign →',
+}: {
+  onComplete: () => void;
+  title?: string;
+  subtitle?: string;
+  submitLabel?: string;
+}) {
   const toast = useToast();
   const [moment, setMoment] = useState<string>(MOMENTS[0].label);
   const [goal, setGoal] = useState<string>(GOAL_OPTIONS[0].label);
@@ -81,6 +92,15 @@ export default function CampaignOnboarding({ onComplete }: { onComplete: () => v
   const [err, setErr] = useState('');
 
   const current = MOMENTS.find((m) => m.label === moment) || MOMENTS[0];
+
+  // Live "review ringkas" values (also exactly what finish() will persist).
+  const reviewStart = new Date();
+  const reviewEnd = new Date();
+  reviewEnd.setDate(reviewEnd.getDate() + (duration - 1));
+  const periodStart = toISO(reviewStart);
+  const periodEnd = toISO(reviewEnd);
+  const reviewName = (campaignName || '').trim() || '(belum diisi)';
+  const reviewGoal = (GOAL_OPTIONS.find((g) => g.label === goal) || GOAL_OPTIONS[0]).label;
 
   function pickMoment(label: string) {
     setMoment(label);
@@ -117,10 +137,8 @@ export default function CampaignOnboarding({ onComplete }: { onComplete: () => v
   return (
     <section>
       <div className="card">
-        <h3 style={headStyle}>Buat campaign pertamamu</h3>
-        <p className="notion-muted" style={leadStyle}>
-          Pilih saja yang paling cocok. Ini menentukan arah 30 ide konten yang akan dibuat.
-        </p>
+        <h3 style={headStyle}>{title}</h3>
+        <p className="notion-muted" style={leadStyle}>{subtitle}</p>
 
         <div className="ob-group">
           <h4>Momen campaign</h4>
@@ -208,10 +226,21 @@ export default function CampaignOnboarding({ onComplete }: { onComplete: () => v
           </div>
         </div>
 
+        <div className="ob-group">
+          <h4>Review ringkas</h4>
+          <div className="ob-review">
+            <div><span>Nama</span><strong>{reviewName}</strong></div>
+            <div><span>Momen</span><strong>{moment}</strong></div>
+            <div><span>Tujuan</span><strong>{reviewGoal}</strong></div>
+            <div><span>Durasi</span><strong>{duration} hari ({periodStart} – {periodEnd})</strong></div>
+            <div><span>Posting</span><strong>1 konten per hari selama {duration} hari</strong></div>
+          </div>
+        </div>
+
         {err ? <p style={errStyle}>{err}</p> : null}
 
         <div className="btn-row" style={navRowStyle}>
-          <Button onClick={finish}>Simpan campaign →</Button>
+          <Button onClick={finish}>{submitLabel}</Button>
         </div>
       </div>
     </section>
