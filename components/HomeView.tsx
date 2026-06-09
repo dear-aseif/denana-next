@@ -24,13 +24,19 @@ import {
   getSeriesBible,
   getCompetitors,
   getKols,
+  getTodayWorkItems,
+  getUpcomingWorkItems,
+  type WorkItem,
 } from '@/lib/storage';
-import { getContentStatusLabel, normalizeContentStatus } from '@/lib/labels';
+import { getContentStatusLabel, getContentStatusTone, normalizeContentStatus } from '@/lib/labels';
 import Button from './Button';
 import Card from './Card';
 import PageHeader from './PageHeader';
 import Footer from './Footer';
 import StatusCard from './StatusCard';
+import DashboardStatGrid from './DashboardStatGrid';
+import TodayWorkCard from './TodayWorkCard';
+import NextStepBanner from './NextStepBanner';
 import CampaignSwitcherModal from './CampaignSwitcherModal';
 
 const sectionLabelStyle: React.CSSProperties = { marginBottom: 6, marginTop: 0 };
@@ -48,6 +54,8 @@ export default function HomeView() {
   const [competitors, setCompetitors] = useState<CompetitorEntry[]>([]);
   const [kols, setKols] = useState<KolEntry[]>([]);
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [todayWork, setTodayWork] = useState<WorkItem[]>([]);
+  const [upcomingWork, setUpcomingWork] = useState<WorkItem[]>([]);
 
   function refresh() {
     setBrand(getBrand());
@@ -58,6 +66,8 @@ export default function HomeView() {
     setBible(getSeriesBible());
     setCompetitors(getCompetitors());
     setKols(getKols());
+    setTodayWork(getTodayWorkItems());
+    setUpcomingWork(getUpcomingWorkItems());
   }
 
   useEffect(() => {
@@ -94,22 +104,24 @@ export default function HomeView() {
     next = { title: 'Your profile is ready. Now create your first campaign.', cta: 'Create first campaign', href: '/campaign-setup' };
   } else if (!hasCalendar) {
     next = { title: 'Your campaign is ready. Now build the content plan.', cta: 'Create content plan', href: '/content-calendar' };
-  } else if (counts.posted > 0) {
-    next = { title: 'Your campaign is live. Track progress and prepare the next content.', cta: 'View content plan', href: '/content-calendar' };
   } else if (counts.readyToPost > 0) {
-    next = { title: 'Some content is ready to post. Schedule and publish it.', cta: 'View content', href: '/content-calendar' };
+    next = { title: 'You have content ready to post.', cta: 'Review work', href: '/content-calendar' };
   } else if (counts.inProduction > 0) {
-    next = { title: 'Some content is in production. Continue producing it.', cta: 'View content', href: '/content-calendar' };
+    next = { title: 'Some content is currently in production. Review progress and prepare for posting.', cta: 'Review work', href: '/content-calendar' };
+  } else if (counts.scheduled > 0) {
+    next = { title: 'You have scheduled content ready to assign or start producing.', cta: 'Review work', href: '/content-calendar' };
+  } else if (counts.posted > 0 && counts.posted === counts.total) {
+    next = { title: 'All your content is posted. Plan your next move.', cta: 'View content plan', href: '/content-calendar' };
   } else {
-    next = { title: 'Your content plan is ready. Pick the first week of content to start producing.', cta: 'View content plan', href: '/content-calendar' };
+    next = { title: 'Your content plan is ready. Pick content to schedule for production.', cta: 'View content plan', href: '/content-calendar' };
   }
 
   const statItems = [
-    { key: 'planning', label: getContentStatusLabel('Planning'), value: counts.planning },
-    { key: 'scheduled', label: getContentStatusLabel('Scheduled'), value: counts.scheduled },
-    { key: 'production', label: getContentStatusLabel('In Production'), value: counts.inProduction },
-    { key: 'ready', label: getContentStatusLabel('Ready to Post'), value: counts.readyToPost },
-    { key: 'posted', label: getContentStatusLabel('Posted'), value: counts.posted },
+    { key: 'planning', label: getContentStatusLabel('Planning'), value: counts.planning, tone: getContentStatusTone('Planning') },
+    { key: 'scheduled', label: getContentStatusLabel('Scheduled'), value: counts.scheduled, tone: getContentStatusTone('Scheduled') },
+    { key: 'production', label: getContentStatusLabel('In Production'), value: counts.inProduction, tone: getContentStatusTone('In Production') },
+    { key: 'ready', label: getContentStatusLabel('Ready to Post'), value: counts.readyToPost, tone: getContentStatusTone('Ready to Post') },
+    { key: 'posted', label: getContentStatusLabel('Posted'), value: counts.posted, tone: getContentStatusTone('Posted') },
   ];
 
   function switchCampaign(id: string) {
@@ -171,20 +183,7 @@ export default function HomeView() {
           <Card className="cc-panel">
             <p className="notion-eyebrow" style={sectionLabelStyle}>Content progress</p>
             {hasCalendar ? (
-              <>
-                <div className="cc-total">
-                  <span className="cc-total-num">{counts.total}</span>
-                  <span className="cc-total-label">total content</span>
-                </div>
-                <div className="cc-stats">
-                  {statItems.map((s) => (
-                    <div key={s.key} className="cc-stat">
-                      <span className="cc-stat-num">{s.value}</span>
-                      <span className="cc-stat-label">{s.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
+              <DashboardStatGrid total={counts.total} stats={statItems} />
             ) : (
               <div className="cc-panel-empty">
                 <div className="cc-empty-emoji">🗓️</div>
@@ -196,15 +195,16 @@ export default function HomeView() {
         </div>
       </section>
 
-      {/* ---- 4. Next step card (the obvious main CTA) ---- */}
+      {/* ---- 3b. Today's / Upcoming work (Work Calendar helper data) ---- */}
+      {hasCalendar && (
+        <section>
+          <TodayWorkCard today={todayWork} upcoming={upcomingWork} />
+        </section>
+      )}
+
+      {/* ---- 4. Next step banner (the obvious main CTA) ---- */}
       <section>
-        <Card className="cc-next">
-          <div className="cc-next-text">
-            <p className="cc-next-label">Next step</p>
-            <p className="cc-next-title">{next.title}</p>
-          </div>
-          <Button href={next.href}>{next.cta} &rarr;</Button>
-        </Card>
+        <NextStepBanner title={next.title} cta={next.cta} href={next.href} />
       </section>
 
       {/* ---- 5. Core flow cards (secondary) ---- */}

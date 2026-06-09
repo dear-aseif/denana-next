@@ -1190,3 +1190,36 @@ section { margin-top: 22px; }
 @media (max-width: 860px) {
   .app-topbar { display: none; }
 }
+
+/* ===== Phase 16C - Dashboard Command Center ===== */
+/* Content progress (DashboardStatGrid) - compact, readable status lines */
+.cc-progress{display:flex;flex-direction:column;flex:1;}
+.cc-progress-list{list-style:none;margin:auto 0 0;padding:0;display:flex;flex-direction:column;gap:0;}
+.cc-progress-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--notion-border-soft);}
+.cc-progress-row:last-child{border-bottom:none;}
+.cc-progress-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--notion-text-soft);}
+.cc-progress-dot.tone-planning{background:#8b94a3;}
+.cc-progress-dot.tone-scheduled{background:#2f6db0;}
+.cc-progress-dot.tone-production{background:#c79a2a;}
+.cc-progress-dot.tone-ready{background:#8a5cc4;}
+.cc-progress-dot.tone-posted{background:#3c7a45;}
+.cc-progress-label{flex:1;font-size:13px;color:var(--notion-text);}
+.cc-progress-num{font-size:14px;font-weight:700;color:var(--notion-text);font-variant-numeric:tabular-nums;}
+
+/* Today's / Upcoming work (TodayWorkCard + WorkItemList) */
+.cc-work{display:flex;flex-direction:column;}
+.cc-work-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.cc-work-head-text{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.cc-work-title{margin:0;font-size:16px;font-weight:700;color:var(--notion-text);}
+.cc-work-count{font-size:12.5px;color:var(--notion-text-soft);}
+.wi-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.wi-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid var(--notion-border-soft);border-radius:10px;background:var(--notion-bg-soft);}
+.wi-main{min-width:0;}
+.wi-title{margin:0 0 5px;font-size:14px;font-weight:600;color:var(--notion-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wi-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:12px;color:var(--notion-text-soft);}
+.wi-meta-item{display:inline-flex;align-items:center;}
+.wi-assignee{padding:2px 9px;border-radius:999px;background:#fff;border:1px solid var(--notion-border-soft);font-size:11px;font-weight:600;color:var(--notion-text-soft);}
+.wi-row .status-badge{flex-shrink:0;}
+
+/* Disabled buttons (e.g. the not-yet-live Work Calendar CTA) */
+.btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
