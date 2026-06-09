@@ -1,5 +1,5 @@
 /*
- * Shared domain types for Denana Social Growth OS.
+ * Shared domain types for Denana Next OS.
  * These describe the data the app generates and stores (locally) in Phase 1.
  */
 

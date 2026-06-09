@@ -435,7 +435,7 @@ section:first-child {
 		overflow-x: auto;
 	}
 }
-/* Denana Social Growth OS — white & gold theme overrides on top of _base.css */
+/* Denana Next OS — white & gold theme overrides on top of _base.css */
 :root{
   color-scheme: light;
   --notion-bg:#fdfcfa;
@@ -1066,3 +1066,125 @@ section { margin-top: 22px; }
 /* Pilih Campaign modal (compact) */
 .modal.modal-sm{max-width:520px;}
 .modal.modal-sm .modal-body{max-height:60vh;}
+
+/* ===================================================================
+   Phase 16A — desktop shell refinements (Sidebar, ProfileCard,
+   HeaderActions, NavItem, PageHeader, StatusBadge primitives)
+   =================================================================== */
+
+.sidebar-brand-name { white-space: nowrap; }
+
+/* Sidebar business-profile block */
+.profile-block { padding: 10px 10px 4px; flex-shrink: 0; }
+.profile-card {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 9px; border-radius: 10px;
+  border: 1px solid var(--notion-border-soft);
+  background: var(--notion-bg-soft);
+  text-decoration: none;
+  transition: background .13s, border-color .13s;
+}
+.profile-card:hover { background: var(--gold-bg); border-color: rgba(201,161,59,.25); }
+.profile-avatar {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .02em;
+  color: var(--notion-text-soft);
+  background: var(--notion-surface);
+  border: 1px solid var(--notion-border);
+  flex-shrink: 0;
+}
+.profile-info { min-width: 0; display: flex; flex-direction: column; flex: 1; }
+.profile-name {
+  font-size: 12.5px; font-weight: 600; color: var(--notion-text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.profile-handle {
+  font-size: 11px; color: var(--notion-text-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.profile-chevron { color: var(--notion-text-faint); display: flex; flex-shrink: 0; }
+.profile-complete {
+  display: block; margin-top: 6px; padding: 4px 9px;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--gold-deep); text-decoration: none;
+}
+.profile-complete:hover { text-decoration: underline; }
+
+/* Create Plan primary action */
+.sidebar-create { padding: 4px 10px 8px; flex-shrink: 0; }
+.primary-action-btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; text-decoration: none;
+}
+
+/* NavItem */
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  color: var(--notion-text-soft); text-decoration: none;
+  border: 1px solid transparent;
+  transition: background .13s, color .13s;
+}
+.nav-item:hover { background: var(--gold-bg); color: var(--gold-deep); }
+.nav-item.active {
+  background: var(--gold-bg); color: var(--gold-deep);
+  font-weight: 600; border-color: rgba(201,161,59,.25);
+}
+.nav-item-icon { display: flex; width: 18px; justify-content: center; flex-shrink: 0; }
+.nav-item-label { flex: 1; }
+.nav-item.disabled { color: var(--notion-text-faint); cursor: default; }
+.nav-item.disabled:hover { background: transparent; color: var(--notion-text-faint); }
+.nav-item-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--notion-text-faint);
+  background: var(--notion-gray-bg);
+  border: 1px solid var(--notion-border-soft);
+  padding: 1px 6px; border-radius: 999px;
+}
+
+/* Top header bar with right-aligned header actions */
+.app-topbar {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  height: 56px; padding: 0 28px;
+  border-bottom: 1px solid var(--notion-border-soft);
+  background: var(--notion-surface);
+  position: sticky; top: 0; z-index: 40;
+}
+.header-actions { display: flex; align-items: center; gap: 6px; }
+.header-action-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 32px; padding: 0 10px; border-radius: 8px;
+  border: 1px solid var(--notion-border-soft);
+  background: var(--notion-surface);
+  color: var(--notion-text-soft);
+  font-size: 12.5px; font-weight: 500; cursor: pointer;
+  transition: background .13s, color .13s, border-color .13s;
+}
+.header-action-btn:hover {
+  background: var(--gold-bg); color: var(--gold-deep);
+  border-color: rgba(201,161,59,.25);
+}
+.header-help { padding: 0 12px; }
+
+/* PageHeader actions row */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.page-header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* StatusBadge primitive (ready for Content Planner / My Campaign in 16B) */
+.status-badge {
+  display: inline-flex; align-items: center;
+  font-size: 11.5px; font-weight: 600;
+  padding: 2px 9px; border-radius: 999px;
+  border: 1px solid transparent;
+}
+.status-badge-idea { color: var(--notion-text-soft); background: var(--notion-gray-bg); }
+.status-badge-planning { color: #5b6472; background: #eef1f6; }
+.status-badge-production { color: #a8841f; background: #fdf3e3; }
+.status-badge-posted { color: #3c7a45; background: #eef7ef; }
+
+/* Desktop-first phase: hide top bar on mobile (mobile shell is out of scope) */
+@media (max-width: 860px) {
+  .app-topbar { display: none; }
+}

@@ -53,12 +53,12 @@ export default function FirstRunOnboarding() {
       <div className="fr-wrap">
         <div className="fr-brandbar">
           <span className="fr-logo">✨</span>
-          <span className="fr-logo-text">Denana Social Growth OS</span>
+          <span className="fr-logo-text">Denana Next OS</span>
         </div>
 
         {phase === 'welcome' && (
           <div className="fr-center">
-            <h1 className="fr-title">Selamat datang di Denana Social Growth OS</h1>
+            <h1 className="fr-title">Welcome to Denana Next OS</h1>
             <p className="fr-sub">
               Sistem sederhana untuk merencanakan dan mengelola konten sosial media usahamu.
             </p>

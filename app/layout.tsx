@@ -11,14 +11,14 @@ import RouteBodyClass from '@/components/RouteBodyClass';
 import AppFrame from '@/components/AppFrame';
 
 export const metadata: Metadata = {
-  title: 'Denana Social Growth OS',
+  title: 'Denana Next OS',
   description:
     'Content planning OS for DenanavBeauty Salon — generate and manage social media content plans for Instagram and Facebook.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
+    <html lang="en">
       <body>
         <ToastProvider>
           <RouteBodyClass />

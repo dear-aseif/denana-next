@@ -1,6 +1,6 @@
 /*
  * sampleContent.ts
- * All static content data for Denana Social Growth OS (Phase 1).
+ * All static content data for Denana Next OS (Phase 1).
  * Ported verbatim from the original prototype — defaults, field metadata,
  * pillars, formats, and the Bahasa Indonesia topic / CTA / hashtag banks.
  *

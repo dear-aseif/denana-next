@@ -17,7 +17,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { getBrand } from '@/lib/storage';
-import Header from './Header';
+import AppShell from './AppShell';
 import FirstRunOnboarding from './FirstRunOnboarding';
 
 export default function AppFrame({ children }: { children: React.ReactNode }) {
@@ -35,10 +35,5 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
 
   if (!hasBrand) return <FirstRunOnboarding />;
 
-  return (
-    <div className="app-layout">
-      <Header />
-      <div className="app-content">{children}</div>
-    </div>
-  );
+  return <AppShell>{children}</AppShell>;
 }
