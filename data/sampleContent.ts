@@ -15,7 +15,8 @@ import type {
   Pillar,
   ContentFormat,
   Objective,
-  ProductionStatus,
+  ContentStatus,
+  ContentAssignee,
   PillarPlanEntry,
 } from '@/types/content';
 
@@ -154,7 +155,17 @@ export const FIRST_WEEK_FORMATS: ContentFormat[] = [
 ];
 
 export const OBJECTIVES: Objective[] = ['Awareness', 'Engagement', 'Trust', 'Booking'];
-export const STATUSES: ProductionStatus[] = ['Ide', 'Direncanakan', 'Sedang Dibuat', 'Sudah Diposting'];
+/* Phase 16B: canonical five-status workflow (English). */
+export const STATUSES: ContentStatus[] = [
+  'Planning',
+  'Scheduled',
+  'In Production',
+  'Ready to Post',
+  'Posted',
+];
+
+/* Phase 16B: simulated assignees (no auth / no real accounts yet). */
+export const ASSIGNEES: ContentAssignee[] = ['Owner', 'Staff 1', 'Staff 2', 'Designer'];
 
 /* ---------- Facial-only content banks (Bahasa Indonesia) ---------- */
 export const TOPIC_BANK: Record<string, TopicBankItem[]> = {

@@ -222,6 +222,7 @@ export function generateCalendar(
     const ctaArr = CTA_BANK[pillar];
     const cta = ctaArr[i % ctaArr.length];
 
+    const now = new Date().toISOString();
     rows.push({
       id: uid(),
       date: toISO(d),
@@ -232,7 +233,12 @@ export function generateCalendar(
       hook: item.h,
       cta,
       objective,
-      productionStatus: 'Ide',
+      productionStatus: 'Planning',
+      scheduledDate: null,
+      scheduledTime: null,
+      assignee: null,
+      createdAt: now,
+      updatedAt: now,
     });
   }
   return rows;

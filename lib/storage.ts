@@ -14,6 +14,8 @@ import type {
   CampaignRecord,
   CampaignStatus,
   ContentRow,
+  ContentStatus,
+  ContentAssignee,
   ContentDraft,
   DraftMap,
   SeriesBible,
@@ -21,6 +23,7 @@ import type {
   KolEntry,
 } from '@/types/content';
 import { uid } from './utils';
+import { normalizeContentStatus } from './labels';
 
 /* ---------- Batch 2: Indonesian pillar/status normalization ----------
  * Browsers from earlier versions may hold calendars/drafts/brand profiles
@@ -36,18 +39,14 @@ const PILLAR_MIGRATION: Record<string, string> = {
   'Promo & Booking Awareness': 'Promo & Booking',
 };
 
-const STATUS_MIGRATION: Record<string, string> = {
-  Idea: 'Ide',
-  Planned: 'Direncanakan',
-  'In Production': 'Sedang Dibuat',
-  Posted: 'Sudah Diposting',
-};
-
+/*
+ * Phase 16B: content status is now canonical English (ContentStatus). Legacy
+ * Indonesian/English values are migrated on read via normalizeContentStatus()
+ * from lib/labels. (The old English->Indonesian STATUS_MIGRATION was removed;
+ * the direction is now reversed and centralized in lib/labels.)
+ */
 function normalizePillar(p: string): string {
   return (p && PILLAR_MIGRATION[p]) || p;
-}
-function normalizeStatus(s: string): string {
-  return (s && STATUS_MIGRATION[s]) || s;
 }
 function normalizePillarText(text: string): string {
   if (!text) return text;
@@ -104,12 +103,22 @@ export function saveBrand(data: BrandSnapshot): boolean {
  * saveCalendar) keep their exact signatures and now read/write the ACTIVE
  * campaign record, so every existing consumer keeps working unchanged.
  */
-function normalizeRows(rows: ContentRow[]): ContentRow[] {
+/*
+ * Normalize content rows on read so the rest of the app only ever sees clean
+ * data: migrated pillar names, canonical ContentStatus, a backfilled
+ * campaignId, and null-defaulted scheduling/assignee fields. Old rows missing
+ * the Phase 16B fields therefore never crash a consumer.
+ */
+function normalizeRows(rows: ContentRow[], campaignId?: string): ContentRow[] {
   if (!Array.isArray(rows)) return [];
   return rows.map((r) => ({
     ...r,
+    campaignId: r.campaignId || campaignId,
     pillar: normalizePillar(r.pillar),
-    productionStatus: normalizeStatus(r.productionStatus),
+    productionStatus: normalizeContentStatus(r.productionStatus),
+    scheduledDate: r.scheduledDate ?? null,
+    scheduledTime: r.scheduledTime ?? null,
+    assignee: r.assignee ?? null,
   }));
 }
 
@@ -154,7 +163,7 @@ export function getCampaigns(): CampaignRecord[] {
   ensureCampaignsMigrated();
   const recs = load<CampaignRecord[]>(STORAGE_KEYS.campaigns, []);
   if (!Array.isArray(recs)) return [];
-  return recs.map((r) => ({ ...r, calendar: normalizeRows(r.calendar) }));
+  return recs.map((r) => ({ ...r, calendar: normalizeRows(r.calendar, r.id) }));
 }
 
 function saveCampaigns(records: CampaignRecord[]): boolean {
@@ -239,7 +248,7 @@ export function saveCampaign(data: Campaign): boolean {
 
 export function getCalendar(): ContentRow[] {
   const rec = getActiveCampaignRecord();
-  return rec ? normalizeRows(rec.calendar) : [];
+  return rec ? normalizeRows(rec.calendar, rec.id) : [];
 }
 
 /** Save calendar rows onto the ACTIVE campaign record. */
@@ -304,6 +313,141 @@ export function putDraft(id: string, draft: ContentDraft): void {
 }
 export function draftCount(): number {
   return Object.keys(getDrafts()).length;
+}
+
+/* ---------- Phase 16B: content status + Work Calendar helpers ----------
+ * These operate on the master content rows stored inside each
+ * CampaignRecord.calendar. They never duplicate content: the Work Calendar is
+ * a *view* over rows that have a scheduledDate, always referencing the original
+ * content item by id. Mutations update in place and persist via saveCampaigns,
+ * so Content Planner, Dashboard, and a future Work Calendar all read the same
+ * source of truth.
+ */
+
+/** A content row enriched with its owning campaign context (for Work Calendar). */
+export interface WorkItem extends ContentRow {
+  campaignId: string;
+  campaignName: string;
+}
+
+/**
+ * Find and mutate a single content row across ALL campaigns, then persist.
+ * Returns the updated row (with a refreshed updatedAt) or null if not found.
+ */
+function mutateContentRow(
+  contentId: string,
+  mutate: (row: ContentRow) => ContentRow,
+): ContentRow | null {
+  const recs = getCampaigns();
+  let updated: ContentRow | null = null;
+  const now = new Date().toISOString();
+  const next = recs.map((rec) => {
+    let touched = false;
+    const calendar = rec.calendar.map((row) => {
+      if (row.id !== contentId) return row;
+      const result: ContentRow = { ...mutate(row), updatedAt: now };
+      updated = result;
+      touched = true;
+      return result;
+    });
+    return touched ? { ...rec, calendar, updatedAt: now } : rec;
+  });
+  if (updated) saveCampaigns(next);
+  return updated;
+}
+
+/** Update a content item's workflow status (normalized to ContentStatus). */
+export function updateContentStatus(
+  contentId: string,
+  status: ContentStatus | string,
+): ContentRow | null {
+  return mutateContentRow(contentId, (row) => ({
+    ...row,
+    productionStatus: normalizeContentStatus(status),
+  }));
+}
+
+/** Update a content item's simulated assignee. Pass null to clear. */
+export function updateContentAssignee(
+  contentId: string,
+  assignee: ContentAssignee | string | null,
+): ContentRow | null {
+  return mutateContentRow(contentId, (row) => ({
+    ...row,
+    assignee: assignee || null,
+  }));
+}
+
+/**
+ * Assign a content item to a date on the Work Calendar.
+ * - Sets scheduledDate (+ optional time + assignee).
+ * - Bumps status Planning -> Scheduled (leaves later statuses untouched).
+ * - Does NOT remove the item from Content Planner (still the master list).
+ */
+export function assignContentToWorkCalendar(
+  contentId: string,
+  opts: { date: string; time?: string | null; assignee?: ContentAssignee | string | null },
+): ContentRow | null {
+  return mutateContentRow(contentId, (row) => {
+    const current = normalizeContentStatus(row.productionStatus);
+    return {
+      ...row,
+      scheduledDate: opts.date || null,
+      scheduledTime: opts.time ?? row.scheduledTime ?? null,
+      assignee: opts.assignee ?? row.assignee ?? null,
+      productionStatus: current === 'Planning' ? 'Scheduled' : current,
+    };
+  });
+}
+
+/** Remove a Work Calendar assignment (keeps the item in the Content Planner). */
+export function unassignContentFromWorkCalendar(contentId: string): ContentRow | null {
+  return mutateContentRow(contentId, (row) => {
+    const current = normalizeContentStatus(row.productionStatus);
+    return {
+      ...row,
+      scheduledDate: null,
+      scheduledTime: null,
+      productionStatus: current === 'Scheduled' ? 'Planning' : current,
+    };
+  });
+}
+
+/** All scheduled content across campaigns, as Work Calendar items (date-sorted). */
+export function getWorkItems(): WorkItem[] {
+  const items: WorkItem[] = [];
+  getCampaigns().forEach((rec) => {
+    rec.calendar.forEach((row) => {
+      if (row.scheduledDate) {
+        items.push({ ...row, campaignId: rec.id, campaignName: rec.campaign.campaignName });
+      }
+    });
+  });
+  items.sort((a, b) => {
+    const ad = (a.scheduledDate || '') + (a.scheduledTime || '');
+    const bd = (b.scheduledDate || '') + (b.scheduledTime || '');
+    return ad < bd ? -1 : ad > bd ? 1 : 0;
+  });
+  return items;
+}
+
+function localTodayISO(): string {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + m + '-' + day;
+}
+
+/** Work items scheduled for today. */
+export function getTodayWorkItems(): WorkItem[] {
+  const today = localTodayISO();
+  return getWorkItems().filter((i) => (i.scheduledDate || '').slice(0, 10) === today);
+}
+
+/** Work items scheduled after today (upcoming). */
+export function getUpcomingWorkItems(): WorkItem[] {
+  const today = localTodayISO();
+  return getWorkItems().filter((i) => (i.scheduledDate || '').slice(0, 10) > today);
 }
 
 /** Reset all local prototype data (used by the error-recovery card). */

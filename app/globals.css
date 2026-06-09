@@ -535,7 +535,7 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold-soft);}
 
-/* ===== Phase 1.5A (rev) ������� Full-screen first-run onboarding ===== */
+/* ===== Phase 1.5A (rev) ��������� Full-screen first-run onboarding ===== */
 .fr-screen{min-height:100vh;background:var(--notion-bg-soft);display:flex;flex-direction:column;align-items:center;padding:44px 18px 64px;}
 .fr-wrap{width:100%;max-width:680px;margin:0 auto;}
 .fr-brandbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:30px;}
@@ -1181,7 +1181,9 @@ section { margin-top: 22px; }
 }
 .status-badge-idea { color: var(--notion-text-soft); background: var(--notion-gray-bg); }
 .status-badge-planning { color: #5b6472; background: #eef1f6; }
+.status-badge-scheduled { color: #2f6db0; background: #e9f1fb; }
 .status-badge-production { color: #a8841f; background: #fdf3e3; }
+.status-badge-ready { color: #8a5cc4; background: #f2ecfb; }
 .status-badge-posted { color: #3c7a45; background: #eef7ef; }
 
 /* Desktop-first phase: hide top bar on mobile (mobile shell is out of scope) */

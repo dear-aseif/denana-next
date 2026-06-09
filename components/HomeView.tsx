@@ -25,7 +25,7 @@ import {
   getCompetitors,
   getKols,
 } from '@/lib/storage';
-import { productionStatusLabel } from '@/lib/labels';
+import { getContentStatusLabel, normalizeContentStatus } from '@/lib/labels';
 import Button from './Button';
 import Card from './Card';
 import PageHeader from './PageHeader';
@@ -74,14 +74,16 @@ export default function HomeView() {
   const hasCompetitors = competitors.length > 0;
   const hasKols = kols.length > 0;
 
-  /* ---- Content progress counts (count existing rows only) ---- */
-  const countBy = (status: string) => calendar.filter((r) => r.productionStatus === status).length;
+  /* ---- Content progress counts (Phase 16B five-status workflow) ---- */
+  const countBy = (status: string) =>
+    calendar.filter((r) => normalizeContentStatus(r.productionStatus) === status).length;
   const counts = {
     total: calendar.length,
-    ide: countBy('Ide'),
-    direncanakan: countBy('Direncanakan'),
-    sedangDibuat: countBy('Sedang Dibuat'),
-    sudahDiposting: countBy('Sudah Diposting'),
+    planning: countBy('Planning'),
+    scheduled: countBy('Scheduled'),
+    inProduction: countBy('In Production'),
+    readyToPost: countBy('Ready to Post'),
+    posted: countBy('Posted'),
   };
 
   /* ---- Recommended next step (one clear action based on data state) ---- */
@@ -92,19 +94,22 @@ export default function HomeView() {
     next = { title: 'Your profile is ready. Now create your first campaign.', cta: 'Create first campaign', href: '/campaign-setup' };
   } else if (!hasCalendar) {
     next = { title: 'Your campaign is ready. Now build the content plan.', cta: 'Create content plan', href: '/content-calendar' };
-  } else if (counts.sudahDiposting > 0) {
+  } else if (counts.posted > 0) {
     next = { title: 'Your campaign is live. Track progress and prepare the next content.', cta: 'View content plan', href: '/content-calendar' };
-  } else if (counts.sedangDibuat > 0) {
+  } else if (counts.readyToPost > 0) {
+    next = { title: 'Some content is ready to post. Schedule and publish it.', cta: 'View content', href: '/content-calendar' };
+  } else if (counts.inProduction > 0) {
     next = { title: 'Some content is in production. Continue producing it.', cta: 'View content', href: '/content-calendar' };
   } else {
     next = { title: 'Your content plan is ready. Pick the first week of content to start producing.', cta: 'View content plan', href: '/content-calendar' };
   }
 
   const statItems = [
-    { key: 'ide', label: productionStatusLabel('Ide'), value: counts.ide },
-    { key: 'direncanakan', label: productionStatusLabel('Direncanakan'), value: counts.direncanakan },
-    { key: 'dibuat', label: productionStatusLabel('Sedang Dibuat'), value: counts.sedangDibuat },
-    { key: 'diposting', label: productionStatusLabel('Sudah Diposting'), value: counts.sudahDiposting },
+    { key: 'planning', label: getContentStatusLabel('Planning'), value: counts.planning },
+    { key: 'scheduled', label: getContentStatusLabel('Scheduled'), value: counts.scheduled },
+    { key: 'production', label: getContentStatusLabel('In Production'), value: counts.inProduction },
+    { key: 'ready', label: getContentStatusLabel('Ready to Post'), value: counts.readyToPost },
+    { key: 'posted', label: getContentStatusLabel('Posted'), value: counts.posted },
   ];
 
   function switchCampaign(id: string) {

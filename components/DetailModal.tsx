@@ -14,6 +14,7 @@ import { generateDetail, detailTexts } from '@/lib/generator';
 import { fmtDate, fmtDateTime } from '@/lib/utils';
 import { getDraft, putDraft } from '@/lib/storage';
 import { copyText } from '@/lib/exportUtils';
+import { getContentStatusLabel, normalizeContentStatus } from '@/lib/labels';
 import { useToast } from './ToastProvider';
 import Button from './Button';
 import Note from './Note';
@@ -132,14 +133,14 @@ export default function DetailModal({
     setSavedAt(new Date().toISOString());
     toast('Draft konten tersimpan 💾');
     onDraftSaved();
-    if (row.productionStatus === 'Ide') {
+    if (normalizeContentStatus(row.productionStatus) === 'Planning') {
       if (
         window.confirm(
-          'Draft sudah tersimpan. Ubah status produksi konten ini dari "Ide" menjadi "Direncanakan"?',
+          'Draft saved. Move this content from "Planning" to "In Production"?',
         )
       ) {
-        onStatusChange(row.id, 'Direncanakan');
-        toast('Status diubah ke Direncanakan');
+        onStatusChange(row.id, 'In Production');
+        toast('Status changed to In Production');
       }
     }
   }
@@ -157,7 +158,7 @@ export default function DetailModal({
             <h2 style={h2Style}>{row.topicTitle}</h2>
             <div className="meta">
               {fmtDate(row.date)} · {row.day} · {row.format} · {row.objective} · Status:{' '}
-              {row.productionStatus}
+              {getContentStatusLabel(row.productionStatus)}
             </div>
           </div>
           <button className="x-btn" onClick={onClose} aria-label="Tutup">
