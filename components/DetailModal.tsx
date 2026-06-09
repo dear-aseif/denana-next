@@ -18,6 +18,7 @@ import { getContentStatusLabel, normalizeContentStatus } from '@/lib/labels';
 import { useToast } from './ToastProvider';
 import Button from './Button';
 import Note from './Note';
+import StatusBadge from './StatusBadge';
 
 const noteTopStyle: React.CSSProperties = { marginTop: 6 };
 const bannerStyle: React.CSSProperties = { margin: '0 0 16px' };
@@ -77,12 +78,14 @@ export default function DetailModal({
   onClose,
   onStatusChange,
   onDraftSaved,
+  onRequestAssign,
 }: {
   row: ContentRow;
   brand: BrandSnapshot;
   onClose: () => void;
   onStatusChange: (id: string, status: string) => void;
   onDraftSaved: () => void;
+  onRequestAssign?: (id: string) => void;
 }) {
   const toast = useToast();
   const existingDraft = useMemo(() => getDraft(row.id), [row.id]);
@@ -156,9 +159,18 @@ export default function DetailModal({
           <div className="mt">
             <span className={'pill pill-' + pillarShort(row.pillar)}>{row.pillar}</span>
             <h2 style={h2Style}>{row.topicTitle}</h2>
-            <div className="meta">
-              {fmtDate(row.date)} · {row.day} · {row.format} · {row.objective} · Status:{' '}
-              {getContentStatusLabel(row.productionStatus)}
+            <div className="meta detail-meta">
+              <span>
+                {fmtDate(row.date)} · {row.day} · {row.format} · {row.objective}
+              </span>
+              <StatusBadge status={row.productionStatus} />
+              {row.scheduledDate ? (
+                <span className="detail-sched">
+                  📅 {fmtDate(row.scheduledDate)}
+                  {row.scheduledTime ? ' · ' + row.scheduledTime : ''}
+                  {row.assignee ? ' · ' + row.assignee : ''}
+                </span>
+              ) : null}
             </div>
           </div>
           <button className="x-btn" onClick={onClose} aria-label="Tutup">
@@ -282,6 +294,15 @@ export default function DetailModal({
             {fromDraft ? (
               <Button variant="ghost" size="small" onClick={handleRegen}>
                 ↻ Buat Ulang
+              </Button>
+            ) : null}
+            {onRequestAssign ? (
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => onRequestAssign(row.id)}
+              >
+                {row.scheduledDate ? '🗓️ Edit Schedule' : '📅 Assign to Work Calendar'}
               </Button>
             ) : null}
             <Button onClick={handleSaveDraft}>💾 Simpan Draft Konten</Button>

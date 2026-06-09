@@ -24,6 +24,7 @@ import {
   saveCalendar,
   getDrafts,
   draftCount,
+  assignContentToWorkCalendar,
 } from '@/lib/storage';
 import { generateCalendar } from '@/lib/generator';
 import { exportCSV, calendarToText, copyText } from '@/lib/exportUtils';
@@ -35,6 +36,7 @@ import Footer from './Footer';
 import EmptyState from './EmptyState';
 import CalendarView from './CalendarView';
 import DetailModal from './DetailModal';
+import AssignCalendarModal, { type AssignPayload } from './AssignCalendarModal';
 
 const spacerStyle: React.CSSProperties = { flex: 1 };
 const countStyle: React.CSSProperties = { color: 'var(--notion-text-soft)', fontSize: 13 };
@@ -52,6 +54,7 @@ export default function ContentPlanner() {
   const [fPillar, setFPillar] = useState('');
   const [fFormat, setFFormat] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [assignId, setAssignId] = useState<string | null>(null);
 
   function refreshDraftIds() {
     const drafts = getDrafts();
@@ -164,9 +167,34 @@ export default function ContentPlanner() {
     handleField(id, 'productionStatus', status);
   }
 
+  /* Open the Assign-to-Work-Calendar dialog (from a row or the detail modal). */
+  function handleRequestAssign(id: string) {
+    setOpenId(null);
+    setAssignId(id);
+  }
+
+  /*
+   * Persist an assignment via the Phase 16B helper. The helper updates the
+   * ORIGINAL content row (scheduledDate/time/assignee + Planning->Scheduled)
+   * on the active campaign record, so we just re-read the calendar to refresh
+   * the table. The Dashboard reads the same campaign store, so Today's /
+   * Upcoming Work picks the item up on its next load.
+   */
+  function handleAssign(id: string, opts: AssignPayload) {
+    assignContentToWorkCalendar(id, {
+      date: opts.date,
+      time: opts.time,
+      assignee: opts.assignee,
+    });
+    setRows(getCalendar());
+    setAssignId(null);
+    toast('Added to Work Calendar 📅');
+  }
+
   if (!mounted) return null;
 
   const openRow = openId ? rows.find((r) => r.id === openId) || null : null;
+  const assignRow = assignId ? rows.find((r) => r.id === assignId) || null : null;
   const counts =
     filtered.length +
     ' / ' +
@@ -246,6 +274,7 @@ export default function ContentPlanner() {
               onField={handleField}
               onDetail={(id) => setOpenId(id)}
               onCopy={copyRow}
+              onAssign={handleRequestAssign}
             />
           </section>
 
@@ -268,6 +297,15 @@ export default function ContentPlanner() {
           onClose={() => setOpenId(null)}
           onStatusChange={handleStatusChange}
           onDraftSaved={refreshDraftIds}
+          onRequestAssign={handleRequestAssign}
+        />
+      ) : null}
+
+      {assignRow ? (
+        <AssignCalendarModal
+          row={assignRow}
+          onAssign={handleAssign}
+          onClose={() => setAssignId(null)}
         />
       ) : null}
     </>

@@ -26,12 +26,14 @@ export default function CalendarView({
   onField,
   onDetail,
   onCopy,
+  onAssign,
 }: {
   rows: ContentRow[];
   draftIds: Record<string, boolean>;
   onField: (id: string, key: keyof ContentRow, value: string) => void;
   onDetail: (id: string) => void;
   onCopy: (id: string) => void;
+  onAssign: (id: string) => void;
 }) {
   return (
     <div className="cal-wrap">
@@ -52,6 +54,7 @@ export default function CalendarView({
               onField={onField}
               onDetail={onDetail}
               onCopy={onCopy}
+              onAssign={onAssign}
             />
           ))}
         </tbody>

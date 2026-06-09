@@ -51,15 +51,19 @@ export default function ContentCard({
   onField,
   onDetail,
   onCopy,
+  onAssign,
 }: {
   row: ContentRow;
   hasDraft: boolean;
   onField: (id: string, key: keyof ContentRow, value: string) => void;
   onDetail: (id: string) => void;
   onCopy: (id: string) => void;
+  onAssign: (id: string) => void;
 }) {
   const sc = pillarShort(row.pillar);
   const detailLabel = hasDraft ? '📝 Ada Draft' : '✍️ Buat Caption';
+  const scheduled = !!row.scheduledDate;
+  const assignLabel = scheduled ? '🗓️ Edit Schedule' : '📅 Assign to Calendar';
   const toast = useToast();
 
   /* Show a brief confirmation for dropdown-only changes (not textarea keystrokes). */
@@ -128,11 +132,21 @@ export default function ContentCard({
           options={STATUSES}
           onChange={(v) => onSelectChange('productionStatus', v)}
         />
+        {scheduled ? (
+          <div className="sched-chip" title="Scheduled on the Work Calendar">
+            📅 {fmtDate(row.scheduledDate as string)}
+            {row.scheduledTime ? ' · ' + row.scheduledTime : ''}
+            {row.assignee ? ' · ' + row.assignee : ''}
+          </div>
+        ) : null}
       </td>
       <td>
         <div className="row-actions">
           <Button size="small" onClick={() => onDetail(row.id)}>
             {detailLabel}
+          </Button>
+          <Button variant="secondary" size="tiny" onClick={() => onAssign(row.id)}>
+            {assignLabel}
           </Button>
           <Button variant="ghost" size="tiny" onClick={() => onCopy(row.id)}>
             📋 Salin
