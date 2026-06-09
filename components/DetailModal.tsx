@@ -114,12 +114,12 @@ export default function DetailModal({
   function handleRegen() {
     if (
       window.confirm(
-        'Buat ulang konten dari ide ini? Draft yang tersimpan tidak berubah sampai kamu menekan Simpan Draft.',
+        'Regenerate this content from the idea? Your saved draft stays unchanged until you press Save Draft.',
       )
     ) {
       setDetail(generateDetail(row, brand));
       setFromDraft(false);
-      toast('Konten dibuat ulang');
+      toast('Content regenerated');
     }
   }
 
@@ -134,7 +134,7 @@ export default function DetailModal({
     });
     setFromDraft(true);
     setSavedAt(new Date().toISOString());
-    toast('Draft konten tersimpan 💾');
+    toast('Content draft saved 💾');
     onDraftSaved();
     if (normalizeContentStatus(row.productionStatus) === 'Planning') {
       if (
@@ -173,16 +173,16 @@ export default function DetailModal({
               ) : null}
             </div>
           </div>
-          <button className="x-btn" onClick={onClose} aria-label="Tutup">
+          <button className="x-btn" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
         <div className="modal-body">
           {fromDraft ? (
             <Note icon="✅" tone="saved" style={bannerStyle}>
-              <strong>Draft tersimpan.</strong> Kamu sedang melihat versi yang sudah
-              disimpan{savedAt ? ' (' + fmtDateTime(savedAt) + ')' : ''}. Tekan{' '}
-              <em>Buat Ulang</em> untuk versi baru.
+              <strong>Draft saved.</strong> You are viewing the saved version
+              {savedAt ? ' (' + fmtDateTime(savedAt) + ')' : ''}. Press{' '}
+              <em>Regenerate</em> for a new version.
             </Note>
           ) : null}
 
@@ -192,16 +192,16 @@ export default function DetailModal({
           <Section
             n={2}
             icon="⚡"
-            title="Caption Singkat"
+            title="Short Caption"
             copyValue={detail.shortCaption}
-            label="Caption singkat"
+            label="Short caption"
           >
             <div className="detail-box">{detail.shortCaption}</div>
           </Section>
           <Section
             n={3}
             icon="🎥"
-            title="Panduan Video (Reels / Facebook)"
+            title="Video Guide (Reels / Facebook)"
             copyValue={t.script}
             label="Script"
           >
@@ -221,16 +221,16 @@ export default function DetailModal({
           <Section
             n={4}
             icon="🎨"
-            title="Arahan Visual"
+            title="Visual Direction"
             copyValue={detail.visualDirection}
-            label="Arahan visual"
+            label="Visual direction"
           >
             <div className="detail-box">{detail.visualDirection}</div>
           </Section>
           <Section
             n={5}
             icon="🔤"
-            title="Pilihan Teks Overlay"
+            title="Overlay Text Options"
             copyValue={detail.overlayOptions.join('\n')}
             label="Overlay text"
           >
@@ -258,9 +258,9 @@ export default function DetailModal({
           <Section
             n={7}
             icon="✅"
-            title="Checklist Sebelum Posting"
+            title="Pre-Posting Checklist"
             copyValue={detail.checklist.map((c) => '- ' + c).join('\n')}
-            label="Checklist posting"
+            label="Posting checklist"
           >
             <ul className="chk">
               {detail.checklist.map((c, i) => (
@@ -270,9 +270,9 @@ export default function DetailModal({
           </Section>
 
           <Note icon="⚠️" style={noteTopStyle}>
-            Konten dibuat otomatis sebagai draft. Tinjau dulu sebelum diposting.
-            Hindari klaim medis &amp; janji hasil pasti — “hasil dapat berbeda pada
-            setiap orang”.
+            Content is generated automatically as a draft. Review it before posting.
+            Avoid medical claims &amp; guaranteed-result promises — “results may vary
+            from person to person”.
           </Note>
         </div>
         <div className="modal-foot">
@@ -286,14 +286,14 @@ export default function DetailModal({
             <Button variant="ghost" size="small" onClick={() => copyText(t.hashtags, 'Hashtags', toast)}>
               📋 Copy Hashtags
             </Button>
-            <Button variant="secondary" size="small" onClick={() => copyText(t.full, 'Semua detail konten', toast)}>
-              📋 Copy Semua
+            <Button variant="secondary" size="small" onClick={() => copyText(t.full, 'All content details', toast)}>
+              📋 Copy All
             </Button>
           </div>
           <div className="foot-main">
             {fromDraft ? (
               <Button variant="ghost" size="small" onClick={handleRegen}>
-                ↻ Buat Ulang
+                ↻ Regenerate
               </Button>
             ) : null}
             {onRequestAssign ? (
@@ -305,9 +305,9 @@ export default function DetailModal({
                 {row.scheduledDate ? '🗓️ Edit Schedule' : '📅 Assign to Work Calendar'}
               </Button>
             ) : null}
-            <Button onClick={handleSaveDraft}>💾 Simpan Draft Konten</Button>
+            <Button onClick={handleSaveDraft}>💾 Save Draft</Button>
             <Button variant="ghost" size="small" onClick={onClose}>
-              Selesai
+              Done
             </Button>
           </div>
         </div>

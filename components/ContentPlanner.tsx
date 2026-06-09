@@ -34,13 +34,12 @@ import Button from './Button';
 import Note from './Note';
 import Footer from './Footer';
 import EmptyState from './EmptyState';
+import PageHeader from './PageHeader';
+import PlannerToolbar from './PlannerToolbar';
 import CalendarView from './CalendarView';
 import DetailModal from './DetailModal';
 import AssignCalendarModal, { type AssignPayload } from './AssignCalendarModal';
 
-const spacerStyle: React.CSSProperties = { flex: 1 };
-const countStyle: React.CSSProperties = { color: 'var(--notion-text-soft)', fontSize: 13 };
-const filterSelectStyle: React.CSSProperties = { maxWidth: 180 };
 const noteTopStyle: React.CSSProperties = { marginTop: 18 };
 
 export default function ContentPlanner() {
@@ -76,10 +75,10 @@ export default function ContentPlanner() {
 
     // Flow guard mirrors the prototype's redirect behavior.
     if (!b) {
-      toast('Lengkapi Profil Brand dulu sebelum membuat rencana konten.');
+      toast('Complete your Brand Profile before planning content.');
       router.replace('/brand-setup');
     } else if (!c) {
-      toast('Buat Rencana Campaign dulu sebelum membuat rencana konten.');
+      toast('Create a Campaign Plan before planning content.');
       router.replace('/campaign-setup');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,24 +104,24 @@ export default function ContentPlanner() {
 
   function doGenerate() {
     if (!brand) {
-      toast('Lengkapi Profil Brand dulu.');
+      toast('Complete your Brand Profile first.');
       router.replace('/brand-setup');
       return;
     }
     if (!campaign) {
-      toast('Buat Rencana Campaign dulu.');
+      toast('Create a Campaign Plan first.');
       router.replace('/campaign-setup');
       return;
     }
     const next = generateCalendar(brand, campaign);
     persist(next);
-    toast(next.length + ' konten berhasil dibuat ✨');
+    toast(next.length + ' content items created ✨');
   }
 
   function regenCal() {
     if (
       window.confirm(
-        'Buat ulang seluruh rencana konten? Draft caption yang sudah tersimpan tidak ikut terhapus, tapi daftar konten akan diganti baru.',
+        'Regenerate the entire content plan? Saved caption drafts are kept, but the content list will be replaced with a fresh one.',
       )
     ) {
       doGenerate();
@@ -150,17 +149,17 @@ export default function ContentPlanner() {
       r.format +
       ' — ' +
       r.pillar +
-      '\nTopik: ' +
+      '\nTopic: ' +
       r.topicTitle +
       '\nHook: ' +
       r.hook +
       '\nCTA: ' +
       r.cta +
-      '\nObjective: ' +
+      '\nGoal: ' +
       r.objective +
       ' | Status: ' +
       r.productionStatus;
-    copyText(text, 'Konten', toast);
+    copyText(text, 'Content', toast);
   }
 
   function handleStatusChange(id: string, status: string) {
@@ -197,92 +196,74 @@ export default function ContentPlanner() {
   const assignRow = assignId ? rows.find((r) => r.id === assignId) || null : null;
   const counts =
     filtered.length +
-    ' / ' +
+    ' of ' +
     rows.length +
-    ' konten · ' +
+    ' items · ' +
     draftCount() +
-    ' draft tersimpan';
+    ' drafts saved';
 
   return (
     <>
-      <section className="page-head">
-        <span className="notion-eyebrow">Langkah 3</span>
-        <h1>Rencana Konten</h1>
-        <p>
-          Rencana konten 30 hari untuk Facial Treatment. Edit langsung di tabel,
-          buat caption &amp; script per konten, lalu simpan sebagai draft.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Content Planner"
+        title="Content Planner"
+        subtitle="Plan, edit, schedule, and track all campaign content from one master list."
+      />
 
       {rows.length === 0 ? (
         <section>
           <div className="card">
             <EmptyState
               big="🗓️"
-              title="Belum ada rencana konten"
-              action={<Button onClick={doGenerate}>✨ Buat Rencana Konten 30 Hari</Button>}
+              title="No content plan yet"
+              action={<Button onClick={doGenerate}>✨ Generate 30-Day Content Plan</Button>}
             >
-              Buat rencana konten 30 hari otomatis berdasarkan Profil Brand dan
-              Rencana Campaign yang sudah kamu simpan.
+              Generate a 30-day content plan automatically from the Brand Profile
+              and Campaign Plan you have saved.
             </EmptyState>
           </div>
         </section>
       ) : (
         <>
           <section>
-            <div className="toolbar">
-              <select
-                className="cell-select"
-                style={filterSelectStyle}
-                value={fPillar}
-                onChange={(e) => setFPillar(e.target.value)}
-              >
-                <option value="">Semua Pilar</option>
-                {PILLARS.map((p) => (
-                  <option key={p}>{p}</option>
-                ))}
-              </select>
-              <select
-                className="cell-select"
-                style={filterSelectStyle}
-                value={fFormat}
-                onChange={(e) => setFFormat(e.target.value)}
-              >
-                <option value="">Semua Format</option>
-                {FORMATS.map((f) => (
-                  <option key={f}>{f}</option>
-                ))}
-              </select>
-              <span style={countStyle}>{counts}</span>
-              <span className="spacer" style={spacerStyle} />
-              <Button variant="ghost" size="small" onClick={copyCal}>
-                📋 Copy
-              </Button>
-              <Button variant="secondary" size="small" onClick={csvCal}>
-                ⬇️ Export CSV
-              </Button>
-              <Button variant="ghost" size="small" onClick={regenCal}>
-                ↻ Buat Ulang
-              </Button>
-            </div>
-          </section>
-
-          <section>
-            <CalendarView
-              rows={filtered}
-              draftIds={draftIds}
-              onField={handleField}
-              onDetail={(id) => setOpenId(id)}
-              onCopy={copyRow}
-              onAssign={handleRequestAssign}
+            <PlannerToolbar
+              pillars={PILLARS}
+              formats={FORMATS}
+              fPillar={fPillar}
+              fFormat={fFormat}
+              onPillar={setFPillar}
+              onFormat={setFFormat}
+              count={counts}
+              onCopy={copyCal}
+              onExport={csvCal}
+              onRegenerate={regenCal}
             />
           </section>
 
           <section>
+            {filtered.length === 0 ? (
+              <div className="card">
+                <EmptyState big="🔍" title="No content matches these filters.">
+                  Try clearing the pillar or format filter to see more content.
+                </EmptyState>
+              </div>
+            ) : (
+              <CalendarView
+                rows={filtered}
+                draftIds={draftIds}
+                onField={handleField}
+                onDetail={(id) => setOpenId(id)}
+                onCopy={copyRow}
+                onAssign={handleRequestAssign}
+              />
+            )}
+          </section>
+
+          <section>
             <Note icon="✏️" style={noteTopStyle}>
-              Semua kolom bisa diedit langsung. Perubahan tersimpan otomatis di
-              browser ini. Tekan <strong>Buat</strong> untuk membuat caption &amp;
-              script, lalu simpan sebagai draft.
+              All columns are editable inline. Changes save automatically in this
+              browser. Use <strong>Open Detail</strong> to build the caption &amp;
+              script, then save it as a draft.
             </Note>
           </section>
         </>

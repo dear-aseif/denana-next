@@ -535,7 +535,7 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold-soft);}
 
-/* ===== Phase 1.5A (rev) ��������� Full-screen first-run onboarding ===== */
+/* ===== Phase 1.5A (rev) ����������� Full-screen first-run onboarding ===== */
 .fr-screen{min-height:100vh;background:var(--notion-bg-soft);display:flex;flex-direction:column;align-items:center;padding:44px 18px 64px;}
 .fr-wrap{width:100%;max-width:680px;margin:0 auto;}
 .fr-brandbar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:30px;}
@@ -603,15 +603,16 @@ body.wide-page .shell,body.wide-page .app-header-inner{max-width:var(--page-widt
 .toolbar .spacer{flex:1;}
 .toolbar select{padding:7px 28px 7px 11px;font-size:13px;}
 .cal-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative;border:1px solid var(--notion-border-soft);border-radius:var(--notion-radius);background:#fff;}
-table.cal{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;margin:0;border:none;border-radius:0;font-size:12.5px;min-width:820px;}
+table.cal{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;margin:0;border:none;border-radius:0;font-size:12.5px;min-width:980px;}
 /* Fixed column widths so the table fits the page; long text wraps inside cells */
+/* 1 Date | 2 Format | 3 Pillar | 4 Topic&Hook(flex) | 5 CTA | 6 Goal | 7 Status | 8 Schedule | 9 Actions */
 table.cal th:nth-child(1),table.cal td:nth-child(1){width:74px;}
 table.cal th:nth-child(2),table.cal td:nth-child(2){width:92px;}
 table.cal th:nth-child(3),table.cal td:nth-child(3){width:116px;}
-table.cal th:nth-child(5),table.cal td:nth-child(5){width:148px;}
+table.cal th:nth-child(5),table.cal td:nth-child(5){width:150px;}
 table.cal th:nth-child(6),table.cal td:nth-child(6){width:100px;}
-table.cal th:nth-child(7),table.cal td:nth-child(7){width:108px;}
-table.cal th:nth-child(8),table.cal td:nth-child(8){width:96px;}
+table.cal th:nth-child(7),table.cal td:nth-child(7){width:118px;}
+table.cal th:nth-child(8),table.cal td:nth-child(8){width:138px;}
 table.cal td .pill{white-space:normal;line-height:1.25;}
 table.cal th{background:var(--gold-bg);color:var(--gold-deep);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;padding:9px 9px;position:sticky;top:0;}
 table.cal td{padding:8px 9px;border-bottom:1px solid var(--notion-border-soft);border-right:none;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;}
@@ -619,7 +620,7 @@ table.cal tr:hover td{background:var(--gold-bg);}
 table.cal td.date{white-space:nowrap;font-weight:600;}
 table.cal td.date small{display:block;font-weight:500;color:var(--notion-text-faint);}
 /* Sticky right-hand action column so the Aksi buttons are never clipped */
-table.cal th:last-child,table.cal td:last-child{position:sticky;right:0;width:96px;}
+table.cal th:last-child,table.cal td:last-child{position:sticky;right:0;width:120px;}
 table.cal td:last-child{background:#fff;z-index:2;box-shadow:-7px 0 8px -7px rgba(0,0,0,.16);}
 table.cal th:last-child{top:0;background:var(--gold-bg);z-index:4;box-shadow:-7px 0 8px -7px rgba(0,0,0,.16);}
 table.cal tr:hover td:last-child{background:var(--gold-bg);}
@@ -1493,4 +1494,73 @@ section { margin-top: 22px; }
 /* Empty state --------------------------------------------- */
 .wc-empty-card {
   padding: 8px;
+}
+
+/* ============================================================
+   Phase 16F — Content Planner master-list refinement
+   ============================================================ */
+
+/* Toolbar count text */
+.planner-toolbar .planner-count{
+  color:var(--notion-text-soft);
+  font-size:13px;
+  white-space:nowrap;
+}
+
+/* Topic / Hook cell hierarchy ----------------------------- */
+.topic-cell{display:flex;flex-direction:column;gap:4px;}
+.topic-cell .topic-title-input{
+  font-weight:600;
+  color:var(--notion-text);
+  min-height:34px;
+  max-height:80px;
+  line-height:1.3;
+}
+.topic-cell .topic-hook-input{
+  font-style:italic;
+  color:var(--notion-text-soft);
+  font-size:12px;
+  min-height:30px;
+  max-height:64px;
+  line-height:1.3;
+}
+
+/* CTA cell — compact, scrolls instead of stretching the row */
+textarea.cell-input.cta-input{
+  min-height:34px;
+  max-height:64px;
+  line-height:1.3;
+}
+
+/* Status cell — badge primary, edit select subdued beneath -- */
+.status-cell{display:flex;flex-direction:column;gap:6px;align-items:flex-start;}
+.status-cell .status-badge{white-space:nowrap;}
+.status-cell .status-cell-select{
+  width:100%;
+  font-size:11.5px;
+  padding:3px 6px;
+  border:1px solid transparent;
+  background:transparent;
+  border-radius:7px;
+  color:var(--notion-text-soft);
+}
+.status-cell .status-cell-select:hover{
+  border-color:var(--notion-border-soft);
+  background:#fff;
+}
+
+/* Schedule cell — "Not scheduled" subtle hint -------------- */
+.sched-none{
+  font-size:11.5px;
+  color:var(--notion-text-faint);
+  font-style:italic;
+}
+table.cal td .sched-chip{margin-top:0;}
+
+/* Row action stack — one primary, two compact secondaries -- */
+.planner-actions{gap:6px;}
+.planner-actions .btn.secondary,
+.planner-actions .btn.ghost{
+  font-size:11px;
+  padding:3px 6px;
 }

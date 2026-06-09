@@ -10,14 +10,15 @@ import type { ContentRow } from '@/types/content';
 import ContentCard from './ContentCard';
 
 const HEADERS = [
-  'Tanggal',
+  'Date',
   'Format',
-  'Pilar',
-  'Topik & Hook',
+  'Pillar',
+  'Topic & Hook',
   'CTA',
-  'Tujuan',
+  'Goal',
   'Status',
-  'Aksi',
+  'Schedule',
+  'Actions',
 ];
 
 export default function CalendarView({

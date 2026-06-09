@@ -1,24 +1,25 @@
 'use client';
 
 /*
- * ContentCard
- * A single editable row in the content calendar table (one <tr>).
- * Ported from the prototype's buildRow() + inline cell inputs/selects.
- * Every cell edits the row in place; the parent persists to localStorage.
+ * ContentCard (Phase 16A; refined in Phase 16F)
+ * A single editable row in the Content Planner master table (one <tr>).
+ * Cells map to: Date | Format | Pillar | Topic & Hook | CTA | Goal | Status |
+ * Schedule | Actions. Every editable cell mutates the row in place; the parent
+ * persists to localStorage. Status and Schedule are now visually separated,
+ * and row actions are grouped via PlannerActionGroup.
  */
 import React from 'react';
-import type { ContentRow } from '@/types/content';
-import { FORMATS, OBJECTIVES, PILLARS, STATUSES, pillarShort } from '@/data/sampleContent';
+import type { ContentRow, ContentStatus } from '@/types/content';
+import { FORMATS, OBJECTIVES, PILLARS, pillarShort } from '@/data/sampleContent';
 import { fmtDate } from '@/lib/utils';
-import Button from './Button';
 import { useToast } from './ToastProvider';
+import StatusBadge from './StatusBadge';
+import StatusSelect from './StatusSelect';
+import ScheduleChip from './ScheduleChip';
+import ContentTopicCell from './ContentTopicCell';
+import PlannerActionGroup from './PlannerActionGroup';
 
-const hookStyle: React.CSSProperties = {
-  color: 'var(--notion-text-soft)',
-  fontStyle: 'italic',
-};
 const pillarSelectStyle: React.CSSProperties = { marginTop: 4 };
-const draftTagStyle: React.CSSProperties = { marginTop: 6 };
 
 function SelectCell({
   value,
@@ -61,15 +62,12 @@ export default function ContentCard({
   onAssign: (id: string) => void;
 }) {
   const sc = pillarShort(row.pillar);
-  const detailLabel = hasDraft ? '📝 Ada Draft' : '✍️ Buat Caption';
-  const scheduled = !!row.scheduledDate;
-  const assignLabel = scheduled ? '🗓️ Edit Schedule' : '📅 Assign to Calendar';
   const toast = useToast();
 
-  /* Show a brief confirmation for dropdown-only changes (not textarea keystrokes). */
+  /* Brief confirmation for dropdown-only changes (not textarea keystrokes). */
   function onSelectChange(key: keyof ContentRow, value: string) {
     onField(row.id, key, value);
-    toast('Perubahan tersimpan');
+    toast('Changes saved');
   }
 
   return (
@@ -95,28 +93,14 @@ export default function ContentCard({
         />
       </td>
       <td>
-        <textarea
-          className="cell-input"
-          value={row.topicTitle}
-          onChange={(e) => onField(row.id, 'topicTitle', e.target.value)}
-        />
-        <textarea
-          className="cell-input"
-          style={hookStyle}
-          value={row.hook}
-          onChange={(e) => onField(row.id, 'hook', e.target.value)}
-        />
-        {hasDraft ? (
-          <div style={draftTagStyle}>
-            <span className="draft-badge">✓ Draft tersimpan</span>
-          </div>
-        ) : null}
+        <ContentTopicCell row={row} hasDraft={hasDraft} onField={onField} />
       </td>
       <td>
         <textarea
-          className="cell-input"
+          className="cell-input cta-input"
           value={row.cta}
           onChange={(e) => onField(row.id, 'cta', e.target.value)}
+          aria-label="CTA"
         />
       </td>
       <td>
@@ -127,31 +111,25 @@ export default function ContentCard({
         />
       </td>
       <td>
-        <SelectCell
-          value={String(row.productionStatus)}
-          options={STATUSES}
-          onChange={(v) => onSelectChange('productionStatus', v)}
-        />
-        {scheduled ? (
-          <div className="sched-chip" title="Scheduled on the Work Calendar">
-            📅 {fmtDate(row.scheduledDate as string)}
-            {row.scheduledTime ? ' · ' + row.scheduledTime : ''}
-            {row.assignee ? ' · ' + row.assignee : ''}
-          </div>
-        ) : null}
+        <div className="status-cell">
+          <StatusBadge status={row.productionStatus} />
+          <StatusSelect
+            value={row.productionStatus}
+            className="status-cell-select"
+            onChange={(s: ContentStatus) => onSelectChange('productionStatus', s)}
+          />
+        </div>
       </td>
       <td>
-        <div className="row-actions">
-          <Button size="small" onClick={() => onDetail(row.id)}>
-            {detailLabel}
-          </Button>
-          <Button variant="secondary" size="tiny" onClick={() => onAssign(row.id)}>
-            {assignLabel}
-          </Button>
-          <Button variant="ghost" size="tiny" onClick={() => onCopy(row.id)}>
-            📋 Salin
-          </Button>
-        </div>
+        <ScheduleChip row={row} />
+      </td>
+      <td>
+        <PlannerActionGroup
+          row={row}
+          onDetail={onDetail}
+          onAssign={onAssign}
+          onCopy={onCopy}
+        />
       </td>
     </tr>
   );
