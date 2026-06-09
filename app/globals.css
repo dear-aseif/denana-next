@@ -1223,3 +1223,33 @@ section { margin-top: 22px; }
 
 /* Disabled buttons (e.g. the not-yet-live Work Calendar CTA) */
 .btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
+
+/* ===== Phase 16C-Rev1 - Dashboard visual alignment ===== */
+/* Command-center vertical rhythm (consistent gaps, no landing-page sprawl) */
+.cc-page{display:flex;flex-direction:column;gap:20px;}
+.cc-page .page-head{margin-bottom:0;}
+
+/* Top command grid: primary campaign card (wider) + progress card */
+.cc-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:18px;align-items:stretch;}
+@media(max-width:860px){.cc-grid{grid-template-columns:1fr;}}
+.cc-grid .cc-panel{height:100%;min-height:0;margin:0;}
+.cc-panel-campaign{box-shadow:0 3px 14px rgba(168,132,31,.10);}
+.cc-panel-campaign h3{font-size:19px;}
+.cc-panel-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:18px;}
+
+/* Agenda look for Today's / Upcoming work */
+.cc-work-head{border-bottom:1px solid var(--notion-border-soft);padding-bottom:12px;margin-bottom:14px;}
+
+/* Compact, non-dominant Next Step banner */
+.cc-next{padding:15px 20px;}
+.cc-next-title{font-size:15px;}
+
+/* Secondary Main Flow row (compact tiles) */
+.cc-flow .notion-eyebrow{margin-bottom:10px;}
+.cc-flow-grid{gap:12px;}
+.status-card-compact{flex-direction:row;align-items:center;gap:12px;padding:13px 15px;}
+.status-card-compact .ico{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:var(--gold-bg);flex-shrink:0;}
+.status-card-compact .scc-main{flex:1;min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.status-card-compact .scc-main h3{margin:0;font-size:14px;}
+.status-card-compact .scc-arrow{flex-shrink:0;color:var(--notion-text-faint);font-size:15px;}
+@media(max-width:680px){.cc-flow-grid{grid-template-columns:1fr;}}

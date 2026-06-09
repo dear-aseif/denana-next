@@ -1,19 +1,23 @@
 'use client';
 
 /*
- * HomeView - Dashboard (Phase 16A: English copy + shell primitives)
- * A practical command center for the salon owner/staff. It answers, from one
- * place: which campaign is active, how far content has progressed, what the
- * next step is, and which button to click.
+ * HomeView — Dashboard / Command Center
  *
- * Phase 16A: UI copy converted to English and the hero/cards now use the
- * reusable PageHeader + Card primitives. Production-status counts still read
- * the original stored values ('Ide' | 'Direncanakan' | 'Sedang Dibuat' |
- * 'Sudah Diposting'); only the displayed labels are mapped to English via
- * lib/labels. No data-structure, generator, or storage changes.
+ * Phase 16C-Rev1 (visual alignment): the dashboard is reworked to read as an
+ * operational command center rather than a long landing page.
+ *  - Compact page header.
+ *  - Top command grid: a primary Active Campaign card (wider) + a Content
+ *    Progress card (status breakdown).
+ *  - Today's / Upcoming Work agenda panel directly below.
+ *  - A compact Next Step banner.
+ *  - Main Flow reduced to a small secondary row; the Supporting Tools section
+ *    was removed from the dashboard (those already live in the sidebar).
+ *
+ * This revision is visual only. The data model, status model, storage logic,
+ * campaign generation, and Work Calendar helpers are unchanged.
  */
 import React, { useEffect, useState } from 'react';
-import type { BrandSnapshot, Campaign, CampaignRecord, ContentRow, SeriesBible, CompetitorEntry, KolEntry } from '@/types/content';
+import type { BrandSnapshot, Campaign, CampaignRecord, ContentRow } from '@/types/content';
 import {
   getBrand,
   getCampaign,
@@ -21,9 +25,6 @@ import {
   getCampaigns,
   getActiveCampaignId,
   setActiveCampaignId,
-  getSeriesBible,
-  getCompetitors,
-  getKols,
   getTodayWorkItems,
   getUpcomingWorkItems,
   type WorkItem,
@@ -40,7 +41,6 @@ import NextStepBanner from './NextStepBanner';
 import CampaignSwitcherModal from './CampaignSwitcherModal';
 
 const sectionLabelStyle: React.CSSProperties = { marginBottom: 6, marginTop: 0 };
-const sectionDescStyle: React.CSSProperties = { marginTop: 0, marginBottom: 14 };
 const panelHeadStyle: React.CSSProperties = { marginTop: 8, marginBottom: 14 };
 
 export default function HomeView() {
@@ -50,9 +50,6 @@ export default function HomeView() {
   const [calendar, setCalendar] = useState<ContentRow[]>([]);
   const [campaigns, setCampaigns] = useState<CampaignRecord[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [bible, setBible] = useState<SeriesBible | null>(null);
-  const [competitors, setCompetitors] = useState<CompetitorEntry[]>([]);
-  const [kols, setKols] = useState<KolEntry[]>([]);
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [todayWork, setTodayWork] = useState<WorkItem[]>([]);
   const [upcomingWork, setUpcomingWork] = useState<WorkItem[]>([]);
@@ -63,9 +60,6 @@ export default function HomeView() {
     setCalendar(getCalendar());
     setCampaigns(getCampaigns());
     setActiveId(getActiveCampaignId());
-    setBible(getSeriesBible());
-    setCompetitors(getCompetitors());
-    setKols(getKols());
     setTodayWork(getTodayWorkItems());
     setUpcomingWork(getUpcomingWorkItems());
   }
@@ -78,11 +72,8 @@ export default function HomeView() {
   if (!mounted) return null;
 
   const hasBrand = !!brand;
-  const hasBible = !!bible;
   const hasCampaign = !!campaign;
   const hasCalendar = calendar.length > 0;
-  const hasCompetitors = competitors.length > 0;
-  const hasKols = kols.length > 0;
 
   /* ---- Content progress counts (Phase 16B five-status workflow) ---- */
   const countBy = (status: string) =>
@@ -133,18 +124,18 @@ export default function HomeView() {
 
   return (
     <>
-      {/* ---- 1. Hero / greeting ---- */}
-      <PageHeader
-        eyebrow="Command Center"
-        title={brand ? `Welcome, ${brand.businessName} 👋` : 'Welcome 👋'}
-        subtitle="See your active campaign, content progress, and next step in one place."
-      />
+      <div className="cc-page">
+        {/* ---- 1. Header / greeting ---- */}
+        <PageHeader
+          eyebrow="Command Center"
+          title={brand ? `Welcome, ${brand.businessName} 👋` : 'Welcome 👋'}
+          subtitle="See your active campaign, content progress, and next step in one place."
+        />
 
-      {/* ---- 2 + 3. Active campaign  &  Content progress ---- */}
-      <section>
-        <div className="grid grid-2">
-          {/* 2. Active campaign card (with switcher when >1 campaign) */}
-          <Card className="cc-panel">
+        {/* ---- 2 + 3. Command grid: primary campaign card + progress ---- */}
+        <div className="cc-grid">
+          {/* 2. Active campaign — the primary working card */}
+          <Card className="cc-panel cc-panel-campaign">
             <p className="notion-eyebrow" style={sectionLabelStyle}>Active campaign</p>
             {hasCampaign && campaign ? (
               <>
@@ -180,7 +171,7 @@ export default function HomeView() {
           </Card>
 
           {/* 3. Content progress summary */}
-          <Card className="cc-panel">
+          <Card className="cc-panel cc-panel-progress">
             <p className="notion-eyebrow" style={sectionLabelStyle}>Content progress</p>
             {hasCalendar ? (
               <DashboardStatGrid total={counts.total} stats={statItems} />
@@ -193,88 +184,46 @@ export default function HomeView() {
             )}
           </Card>
         </div>
-      </section>
 
-      {/* ---- 3b. Today's / Upcoming work (Work Calendar helper data) ---- */}
-      {hasCalendar && (
-        <section>
+        {/* ---- 4. Today's / Upcoming work agenda (Work Calendar helper data) ---- */}
+        {hasCalendar && (
           <TodayWorkCard today={todayWork} upcoming={upcomingWork} />
-        </section>
-      )}
+        )}
 
-      {/* ---- 4. Next step banner (the obvious main CTA) ---- */}
-      <section>
+        {/* ---- 5. Next step banner (compact main CTA) ---- */}
         <NextStepBanner title={next.title} cta={next.cta} href={next.href} />
-      </section>
 
-      {/* ---- 5. Core flow cards (secondary) ---- */}
-      <section>
-        <p className="notion-eyebrow" style={sectionLabelStyle}>Main Flow</p>
-        <div className="grid grid-3">
-          <StatusCard
-            icon="💄"
-            title="Salon Profile"
-            tone={hasBrand ? 'ok' : 'warn'}
-            pill={hasBrand ? 'Complete' : 'Incomplete'}
-            desc="Identity, facial services, tone of voice, and content pillars."
-            btn={hasBrand ? 'Review profile' : 'Complete now'}
-            href="/brand-setup"
-          />
-          <StatusCard
-            icon="📅"
-            title="Campaign Plan"
-            tone={hasCampaign ? 'ok' : 'warn'}
-            pill={hasCampaign ? 'Active' : 'None yet'}
-            desc="Period, goal, platform, and posting frequency for the campaign."
-            btn={hasCampaign ? 'Review campaign' : 'Create campaign'}
-            href="/campaign-setup"
-          />
-          <StatusCard
-            icon="🗓️"
-            title="Content Plan"
-            tone={hasCalendar ? 'ok' : 'warn'}
-            pill={hasCalendar ? calendar.length + ' content' : 'Not created'}
-            desc="Content calendar with captions, scripts, and hashtags."
-            btn={hasCalendar ? 'Open plan' : 'Create plan'}
-            href="/content-calendar"
-          />
-        </div>
-      </section>
-
-      {/* ---- 6. Supporting tools (secondary) ---- */}
-      <section>
-        <p className="notion-eyebrow" style={sectionLabelStyle}>Supporting Tools</p>
-        <p className="notion-muted" style={sectionDescStyle}>Use these once your main flow is running.</p>
-        <div className="grid grid-3">
-          <StatusCard
-            icon="📖"
-            title="Series Bible"
-            tone={hasBible ? 'ok' : 'warn'}
-            pill={hasBible ? 'Saved' : 'Not created'}
-            desc="Manifesto, persona, visual DNA, caption framework, and posting strategy."
-            btn={hasBible ? 'Open Series Bible' : 'Create Series Bible'}
-            href="/series-bible"
-          />
-          <StatusCard
-            icon="🔍"
-            title="Competitor Audit"
-            tone={hasCompetitors ? 'ok' : 'warn'}
-            pill={hasCompetitors ? competitors.length + ' competitors' : 'Empty'}
-            desc="A guide to auditing competitors' organic content plus notes on their strengths and gaps."
-            btn={hasCompetitors ? 'Open Audit' : 'Start Audit'}
-            href="/competitor-audit"
-          />
-          <StatusCard
-            icon="🤝"
-            title="KOL / UGC Brief"
-            tone={hasKols ? 'ok' : 'warn'}
-            pill={hasKols ? kols.length + ' KOLs' : 'Empty'}
-            desc="Collaboration brief for local KOLs/creators plus a candidate list and their status."
-            btn={hasKols ? 'Open Brief' : 'Create Brief'}
-            href="/kol-brief"
-          />
-        </div>
-      </section>
+        {/* ---- 6. Main Flow (compact, secondary) ---- */}
+        <section className="cc-flow">
+          <p className="notion-eyebrow" style={sectionLabelStyle}>Main Flow</p>
+          <div className="grid grid-3 cc-flow-grid">
+            <StatusCard
+              compact
+              icon="💄"
+              title="Salon Profile"
+              tone={hasBrand ? 'ok' : 'warn'}
+              pill={hasBrand ? 'Complete' : 'Incomplete'}
+              href="/brand-setup"
+            />
+            <StatusCard
+              compact
+              icon="📅"
+              title="Campaign Plan"
+              tone={hasCampaign ? 'ok' : 'warn'}
+              pill={hasCampaign ? 'Active' : 'None yet'}
+              href="/campaign-setup"
+            />
+            <StatusCard
+              compact
+              icon="🗓️"
+              title="Content Plan"
+              tone={hasCalendar ? 'ok' : 'warn'}
+              pill={hasCalendar ? calendar.length + ' content' : 'Not created'}
+              href="/content-calendar"
+            />
+          </div>
+        </section>
+      </div>
 
       <Footer />
 
