@@ -22,7 +22,7 @@ const MAIN: Item[] = [
   { label: 'Dashboard', icon: 'dashboard', href: '/' },
   { label: 'My Campaign', icon: 'campaign', href: '/campaign-setup' },
   { label: 'Content Planner', icon: 'planner', href: '/content-calendar' },
-  { label: 'Work Calendar', icon: 'calendar', disabled: true, badge: 'Soon' },
+  { label: 'Work Calendar', icon: 'calendar', href: '/work-calendar' },
 ];
 
 const TOOLS: Item[] = [

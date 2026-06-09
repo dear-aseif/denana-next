@@ -1272,3 +1272,225 @@ section { margin-top: 22px; }
 /* Detail modal header meta: align status badge + schedule inline */
 .detail-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
 .detail-meta .detail-sched{font-size:12px;font-weight:600;color:var(--gold-deep);background:var(--gold-bg);border-radius:8px;padding:2px 8px;}
+
+/* ============================================================
+   Phase 16E — Work Calendar MVP (Day Agenda)
+   ============================================================ */
+
+.wc-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Date navigation ----------------------------------------- */
+.wc-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wc-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.wc-date-input {
+  margin-left: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--notion-border-soft);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--notion-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.wc-date-input:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+}
+.wc-nav-label {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.wc-nav-date {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--notion-text);
+}
+.wc-nav-relative {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  background: var(--gold-bg);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* Daily summary ------------------------------------------- */
+.wc-summary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid var(--notion-border-soft);
+}
+.wc-summary-total {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.wc-summary-total-num {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--notion-text);
+}
+.wc-summary-total-label {
+  font-size: 12px;
+  color: var(--notion-text-soft);
+}
+.wc-summary-cells {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.wc-summary-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--notion-text-soft);
+}
+.wc-summary-cell-num {
+  font-weight: 700;
+  color: var(--notion-text);
+}
+.wc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.wc-dot-scheduled { background: #2f6db0; }
+.wc-dot-production { background: #c79a2a; }
+.wc-dot-ready { background: #8a5cc4; }
+.wc-dot-posted { background: #3c7a45; }
+.wc-dot-planning { background: #8b94a3; }
+
+/* Agenda list --------------------------------------------- */
+.wc-agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.wc-task {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+.wc-task-time {
+  flex: 0 0 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-right: 14px;
+  border-right: 1px solid var(--notion-border-soft);
+}
+.wc-task-time-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--notion-text);
+  font-variant-numeric: tabular-nums;
+}
+.wc-task-time-label {
+  font-size: 11px;
+  color: var(--notion-text-faint);
+}
+.wc-task-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.wc-task-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.wc-task-format {
+  font-size: 11px;
+  color: var(--notion-text-soft);
+  background: var(--notion-bg-soft);
+  border: 1px solid var(--notion-border-soft);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.wc-task-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--notion-text);
+  margin: 0 0 4px;
+}
+.wc-task-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--notion-text-soft);
+  margin-bottom: 10px;
+}
+.wc-task-meta-item { white-space: nowrap; }
+.wc-task-assignee {
+  color: var(--gold-deep);
+  font-weight: 600;
+}
+.wc-task-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--notion-border-soft);
+}
+.wc-ctl {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wc-ctl-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--notion-text-faint);
+}
+.cell-select {
+  padding: 5px 8px;
+  border: 1px solid var(--notion-border-soft);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--notion-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.cell-select:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+}
+.wc-task-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  align-items: center;
+}
+
+/* Empty state --------------------------------------------- */
+.wc-empty-card {
+  padding: 8px;
+}

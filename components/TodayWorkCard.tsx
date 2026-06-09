@@ -44,7 +44,7 @@ export default function TodayWorkCard({
             </span>
           )}
         </div>
-        <Button variant="secondary" size="small" disabled title="Work Calendar is coming soon">
+        <Button href="/work-calendar" variant="secondary" size="small">
           View Work Calendar
         </Button>
       </div>
