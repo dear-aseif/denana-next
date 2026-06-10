@@ -37,46 +37,48 @@ export default function WorkTaskCard({
   const sc = pillarShort(item.pillar);
   return (
     <Card className="wc-task">
-      <div className="wc-task-time">
-        <span className="wc-task-time-val">{item.scheduledTime || '——:——'}</span>
-        <span className="wc-task-time-label">{item.scheduledTime ? '' : 'No time'}</span>
+      {/* Top row: time + status badge */}
+      <div className="wc-task-top">
+        <div className="wc-task-time">
+          <span className="wc-task-time-val">{item.scheduledTime || '——:——'}</span>
+          {item.scheduledTime ? null : <span className="wc-task-time-label">No time set</span>}
+        </div>
+        <StatusBadge status={item.productionStatus} />
       </div>
 
-      <div className="wc-task-main">
-        <div className="wc-task-tags">
-          {item.pillar ? <span className={'pill pill-' + sc}>{item.pillar}</span> : null}
-          {item.format ? <span className="wc-task-format">{item.format}</span> : null}
-          <StatusBadge status={item.productionStatus} />
-        </div>
+      {/* Middle: title + campaign / focus metadata */}
+      <div className="wc-task-body">
         <p className="wc-task-title">{item.topicTitle || 'Untitled content'}</p>
         <div className="wc-task-meta">
+          {item.pillar ? <span className={'pill pill-' + sc}>{item.pillar}</span> : null}
+          {item.format ? <span className="wc-task-format">{item.format}</span> : null}
           {item.campaignName ? <span className="wc-task-meta-item">{item.campaignName}</span> : null}
-          {item.assignee ? <span className="wc-task-meta-item wc-task-assignee">{item.assignee}</span> : null}
         </div>
+      </div>
 
-        <div className="wc-task-controls">
-          <label className="wc-ctl">
-            <span className="wc-ctl-label">Status</span>
-            <StatusSelect
-              value={item.productionStatus}
-              onChange={(s) => onStatus(item.id, s)}
-            />
-          </label>
-          <label className="wc-ctl">
-            <span className="wc-ctl-label">Assignee</span>
-            <AssigneeSelect
-              value={item.assignee}
-              onChange={(a) => onAssignee(item.id, a)}
-            />
-          </label>
-          <div className="wc-task-actions">
-            <Button variant="secondary" size="tiny" onClick={() => onEditSchedule(item.id)}>
-              🗓️ Edit Schedule
-            </Button>
-            <Button variant="ghost" size="tiny" onClick={() => onRemove(item.id)}>
-              Remove from Calendar
-            </Button>
-          </div>
+      {/* Bottom: assignee + status selects, then schedule actions */}
+      <div className="wc-task-controls">
+        <label className="wc-ctl">
+          <span className="wc-ctl-label">Assignee</span>
+          <AssigneeSelect
+            value={item.assignee}
+            onChange={(a) => onAssignee(item.id, a)}
+          />
+        </label>
+        <label className="wc-ctl">
+          <span className="wc-ctl-label">Status</span>
+          <StatusSelect
+            value={item.productionStatus}
+            onChange={(s) => onStatus(item.id, s)}
+          />
+        </label>
+        <div className="wc-task-actions">
+          <Button variant="secondary" size="tiny" onClick={() => onEditSchedule(item.id)}>
+            🗓️ Edit Schedule
+          </Button>
+          <Button variant="ghost" size="tiny" className="wc-btn-danger" onClick={() => onRemove(item.id)}>
+            Remove
+          </Button>
         </div>
       </div>
     </Card>

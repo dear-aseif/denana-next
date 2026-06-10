@@ -1617,3 +1617,114 @@ table.cal td .sched-chip{margin-top:0;}
 .wiz-foot-nav{display:flex;gap:10px;align-items:center;margin-left:auto;}
 
 @media (max-width:560px){.wiz-grid{grid-template-columns:1fr;}}
+
+/* ============================================================
+   Phase 16J — Dashboard + Work Calendar Visual Polish
+   Visual-only refinements, appended last so they win the
+   cascade. Scoped to cc-* (dashboard) and wc-* / wi-* (work
+   calendar) classes. No changes to Content Planner, Detail
+   Modal, or Create Campaign Wizard styling.
+   ============================================================ */
+
+/* ---- Dashboard: command-center rhythm ---- */
+.cc-page { gap: 16px; }
+.cc-page .page-header { align-items: flex-end; }
+.cc-page .page-head h1 { font-size: 23px; line-height: 1.2; margin: 2px 0 0; }
+.cc-page .page-head p { font-size: 13px; margin-top: 5px; }
+
+/* Command grid + panels */
+.cc-grid { gap: 16px; }
+.cc-panel { min-height: 0; padding: 18px 20px; }
+.cc-panel .notion-eyebrow { font-size: 10.5px; letter-spacing: .13em; }
+
+/* Active Campaign — the primary card */
+.cc-panel-campaign { box-shadow: 0 4px 18px rgba(168,132,31,.12); border-color: rgba(168,132,31,.26); }
+.cc-panel-campaign h3 { font-size: 20px; margin: 8px 0 14px; }
+.cc-meta { gap: 0; }
+.cc-meta-row { padding: 8px 0; }
+.cc-meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--notion-text-faint); }
+.cc-meta-value { font-size: 13.5px; }
+.cc-panel-cta { padding-top: 16px; gap: 8px; }
+
+/* Content Progress — compact but informative */
+.cc-panel-progress .cc-total { margin: 4px 0 12px; }
+.cc-total-num { font-size: 30px; }
+.cc-progress-row { padding: 7px 2px; }
+.cc-progress-label { font-size: 12.5px; }
+
+/* Today's / Upcoming Work — clean agenda */
+.cc-work { padding: 18px 20px; }
+.cc-work-head { padding-bottom: 11px; margin-bottom: 12px; }
+.cc-work-title { font-size: 15px; }
+.wi-list { gap: 7px; }
+.wi-row { padding: 10px 13px; transition: border-color .15s, background .15s; }
+.wi-row:hover { border-color: rgba(168,132,31,.30); background: #fff; }
+.wi-title { font-size: 13.5px; margin-bottom: 4px; }
+.wi-meta { font-size: 11.5px; gap: 4px 12px; }
+.wi-assignee { background: var(--gold-bg); border-color: rgba(168,132,31,.20); color: var(--gold-deep); }
+
+/* Compact empty states so they never dominate */
+.cc-work .empty { padding: 22px 16px; border-style: solid; }
+.cc-work .empty .big { font-size: 26px; margin-bottom: 4px; }
+.cc-work .empty h2 { font-size: 15px; margin: 0 0 4px; }
+.cc-work .empty p { font-size: 12.5px; margin: 0 auto 12px; }
+.cc-panel-empty { padding: 10px 4px; gap: 8px; }
+.cc-empty-emoji { font-size: 26px; }
+
+/* Next Step banner — helpful but quieter */
+.cc-next { padding: 13px 18px; border-width: 1px; border-color: rgba(168,132,31,.34); }
+.cc-next-label { font-size: 10.5px; margin-bottom: 2px; }
+.cc-next-title { font-size: 14.5px; font-weight: 600; }
+
+/* Main Flow — clearly secondary */
+.cc-flow { margin-top: 2px; padding-top: 14px; border-top: 1px solid var(--notion-border-soft); }
+.cc-flow .notion-eyebrow { color: var(--notion-text-faint); margin-bottom: 8px; }
+.cc-flow .status-card-compact { padding: 11px 13px; box-shadow: none; }
+
+/* ---- Work Calendar ---- */
+.wc-page { display: flex; flex-direction: column; gap: 16px; }
+.wc-page .page-head { margin-bottom: 0; }
+.wc-page .wc-agenda { margin-top: 0; }
+
+/* Toolbar card holds the navigator + day summary */
+.wc-toolbar { gap: 14px; padding: 16px 18px; }
+
+/* Date navigator — calendar-like header: big date left, controls right */
+.wc-nav { flex-direction: row; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.wc-nav-label { order: -1; flex-direction: column; align-items: flex-start; gap: 3px; }
+.wc-nav-date { font-size: 19px; font-weight: 700; }
+.wc-nav-relative { align-self: flex-start; }
+.wc-nav-controls { gap: 4px; padding: 4px; background: var(--notion-bg-soft); border: 1px solid var(--notion-border-soft); border-radius: 10px; }
+.wc-nav-controls .btn.small { padding: 6px 12px; }
+.wc-nav-controls .btn.ghost { border-color: transparent; }
+.wc-nav-controls .btn.ghost:hover { background: #fff; }
+.wc-date-input { margin-left: 6px; }
+
+/* Daily summary — compact, badge-consistent chips */
+.wc-summary { gap: 10px 12px; padding-top: 12px; }
+.wc-summary-total-num { font-size: 20px; }
+.wc-summary-cells { gap: 8px; }
+.wc-summary-cell { gap: 6px; padding: 4px 11px; border: 1px solid var(--notion-border-soft); border-radius: 999px; background: var(--notion-bg-soft); font-size: 11.5px; }
+.wc-summary-cell-num { font-variant-numeric: tabular-nums; }
+
+/* Agenda + task cards — top / middle / bottom layout */
+.wc-agenda { gap: 10px; }
+.wc-task { display: block; padding: 16px 18px; }
+.wc-task-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.wc-task-time { flex: none; display: flex; align-items: baseline; gap: 8px; padding: 0; border: none; }
+.wc-task-time-val { font-size: 16px; font-weight: 700; }
+.wc-task-time-label { font-size: 11px; color: var(--notion-text-faint); }
+.wc-task-body { margin-bottom: 12px; }
+.wc-task-title { font-size: 15px; margin: 0 0 6px; }
+.wc-task-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0; font-size: 12px; }
+.wc-task-controls { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid var(--notion-border-soft); }
+.wc-task-actions { margin-left: auto; gap: 8px; }
+.wc-btn-danger { color: var(--notion-red); }
+.wc-btn-danger:hover { background: var(--notion-red-bg); color: var(--notion-red); }
+
+/* Empty state — compact, borderless inside the card */
+.wc-empty-card { padding: 6px; }
+.wc-empty-card .empty { padding: 30px 20px; border: none; background: transparent; }
+.wc-empty-card .empty .big { font-size: 30px; margin-bottom: 6px; }
+.wc-empty-card .empty h2 { font-size: 16px; margin: 0 0 4px; }
+.wc-empty-card .empty p { font-size: 13px; margin: 4px auto 14px; }

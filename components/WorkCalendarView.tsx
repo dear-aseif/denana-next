@@ -116,6 +116,7 @@ export default function WorkCalendarView() {
 
   return (
     <>
+      <div className="wc-page">
       <PageHeader
         eyebrow="Work Calendar"
         title="Work Calendar"
@@ -162,6 +163,7 @@ export default function WorkCalendarView() {
           </Card>
         )}
       </section>
+      </div>
 
       <Footer />
 
