@@ -41,3 +41,34 @@ export function lines(s: string): string[] {
     .map((x) => x.trim())
     .filter(Boolean);
 }
+
+/* Phase 16I-Rev1: timezone-safe local date helpers.
+ * The plan/generator run client-side in the user's timezone. Converting a
+ * YYYY-MM-DD date through Date.toISOString() (UTC) shifted dates back a day for
+ * UTC+ timezones (e.g. a June 10 start produced June 9 rows in Asia/Makassar).
+ * These helpers keep date math in local/string space so the selected start
+ * date is always preserved as the first generated row date. */
+export function isoLocal(d: Date): string {
+  const y = d.getFullYear();
+  const m = ('0' + (d.getMonth() + 1)).slice(-2);
+  const day = ('0' + d.getDate()).slice(-2);
+  return y + '-' + m + '-' + day;
+}
+
+export function addDaysISO(iso: string, n: number): string {
+  const parts = String(iso || '').slice(0, 10).split('-');
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  if (!y || !m || !d) return iso;
+  return isoLocal(new Date(y, m - 1, d + n));
+}
+
+export function dayNameFromISO(iso: string): string {
+  const parts = String(iso || '').slice(0, 10).split('-');
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  if (!y || !m || !d) return '';
+  return dayName(new Date(y, m - 1, d));
+}

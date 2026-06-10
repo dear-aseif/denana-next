@@ -16,7 +16,7 @@
  */
 import type { BrandSnapshot, Campaign, ContentRow } from '@/types/content';
 import { generateCalendar } from './generator';
-import { toISO, dayName } from './utils';
+import { toISO, dayName, addDaysISO, dayNameFromISO } from './utils';
 
 export type WizardFrequency = 'daily' | '3pw' | '5pw' | 'custom';
 
@@ -143,8 +143,10 @@ export function buildPlan(brand: BrandSnapshot | null, input: WizardInput): Buil
   const target =
     perWeek >= 7 ? dayCount : clamp(Math.round((dayCount / 7) * perWeek), 1, dayCount);
 
-  const start = new Date(input.periodStart + 'T00:00:00');
-  const startValid = !isNaN(start.getTime());
+  // Phase 16I-Rev1: keep the start date in local string space (no UTC shift).
+  const startISO = /^\d{4}-\d{2}-\d{2}/.test(input.periodStart)
+    ? input.periodStart.slice(0, 10)
+    : '';
 
   const rows: ContentRow[] = [];
   const used = new Set<number>();
@@ -158,11 +160,9 @@ export function buildPlan(brand: BrandSnapshot | null, input: WizardInput): Buil
     const src = dailyRows[Math.min(off, dailyRows.length - 1)];
     let date = src.date;
     let day = src.day;
-    if (startValid) {
-      const d = new Date(start.getTime());
-      d.setDate(start.getDate() + off);
-      date = toISO(d);
-      day = dayName(d);
+    if (startISO) {
+      date = addDaysISO(startISO, off);
+      day = dayNameFromISO(date);
     }
     rows.push({
       ...src,

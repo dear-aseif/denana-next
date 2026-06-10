@@ -113,6 +113,11 @@ export default function DetailModal({
         .filter(Boolean)
         .join(' \u00b7 ')
     : '';
+  // Phase 16I-Rev1: always show a context line; fall back to a generic label
+  // when no campaign metadata could be resolved for this row.
+  const contextLine = genUsing
+    ? 'Generated using: ' + genUsing
+    : 'Generated using: Generic campaign context';
   const [fromDraft, setFromDraft] = useState<boolean>(!!existingDraft);
   const [savedAt, setSavedAt] = useState<string | undefined>(existingDraft?.savedAt);
   const [detail, setDetail] = useState<ContentDetail>(() => {
@@ -133,18 +138,50 @@ export default function DetailModal({
     };
   }, [onClose]);
 
-  const t = detailTexts(detail);
+  const t = detailTexts(detail, row.format);
+  // Phase 16I-Rev1: render the script section by the row format so Carousel /
+  // Stories / Single Post no longer show a video guide.
+  const scriptKind =
+    row.format === 'Carousel'
+      ? 'carousel'
+      : row.format === 'Stories'
+        ? 'stories'
+        : row.format === 'Single Post'
+          ? 'single'
+          : 'video';
+  const scriptTitle =
+    scriptKind === 'carousel'
+      ? 'Carousel Outline'
+      : scriptKind === 'stories'
+        ? 'Story Frame Outline'
+        : scriptKind === 'single'
+          ? 'Post Direction'
+          : 'Video Script (Reels / TikTok)';
+  const scriptIcon =
+    scriptKind === 'carousel'
+      ? '\ud83d\uddbc\ufe0f'
+      : scriptKind === 'stories'
+        ? '\ud83d\udcf1'
+        : scriptKind === 'single'
+          ? '\ud83d\udcdd'
+          : '\ud83c\udfa5';
 
   function handleRegen() {
+    // Phase 16I-Rev1: Regenerate Detail is always available inside the modal.
+    // Only confirm when a saved draft is currently loaded, so saved-draft
+    // content is never silently replaced. The stored draft itself is untouched
+    // until the user presses Save Draft.
     if (
-      window.confirm(
-        'Regenerate this content from the idea? Your saved draft stays unchanged until you press Save Draft.',
+      fromDraft &&
+      !window.confirm(
+        'You are viewing a saved draft. Regenerate a new version? Your saved draft stays unchanged until you press Save Draft.',
       )
     ) {
-      setDetail(generateDetail(row, brand, detailOpts));
-      setFromDraft(false);
-      toast('Content regenerated');
+      return;
     }
+    setDetail(generateDetail(row, brand, detailOpts));
+    setFromDraft(false);
+    toast('Detail regenerated');
   }
 
   function handleSaveDraft() {
@@ -196,11 +233,9 @@ export default function DetailModal({
                 </span>
               ) : null}
             </div>
-            {genUsing ? (
-              <div className="meta" style={genUsingStyle}>
-                Generated using: {genUsing}
-              </div>
-            ) : null}
+            <div className="meta" style={genUsingStyle}>
+              {contextLine}
+            </div>
           </div>
           <button className="x-btn" onClick={onClose} aria-label="Close">
             ×
@@ -229,19 +264,40 @@ export default function DetailModal({
           </Section>
           <Section
             n={3}
-            icon="🎥"
-            title="Video Guide (Reels / Facebook)"
+            icon={scriptIcon}
+            title={scriptTitle}
             copyValue={t.script}
-            label="Script"
+            label={scriptTitle}
           >
             <div className="detail-box" style={scriptBoxStyle}>
               {detail.script.sceneByScene.map((s, i) => (
                 <div className="script-step" key={i}>
                   <div className="t">{s.time}</div>
                   <div>
-                    <div className="vo">🎤 {s.voiceover}</div>
-                    <div className="ov">🎬 {s.visual}</div>
-                    <div className="ov">📝 Overlay: {s.overlayText}</div>
+                    {scriptKind === 'video' ? (
+                      <>
+                        <div className="vo">🎤 {s.voiceover}</div>
+                        <div className="ov">🎬 {s.visual}</div>
+                        <div className="ov">📝 Overlay: {s.overlayText}</div>
+                      </>
+                    ) : scriptKind === 'carousel' ? (
+                      <>
+                        <div className="vo">🧩 {s.voiceover}</div>
+                        <div className="ov">✍️ On-slide: {s.overlayText}</div>
+                        <div className="ov">🎨 {s.visual}</div>
+                      </>
+                    ) : scriptKind === 'stories' ? (
+                      <>
+                        <div className="vo">💬 {s.voiceover}</div>
+                        <div className="ov">🎨 {s.visual}</div>
+                        <div className="ov">📝 {s.overlayText}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="vo">💬 {s.voiceover}</div>
+                        <div className="ov">🎨 {s.visual}</div>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -320,11 +376,9 @@ export default function DetailModal({
             </Button>
           </div>
           <div className="foot-main">
-            {fromDraft ? (
-              <Button variant="ghost" size="small" onClick={handleRegen}>
-                ↻ Regenerate
-              </Button>
-            ) : null}
+            <Button variant="ghost" size="small" onClick={handleRegen}>
+              ↻ Regenerate Detail
+            </Button>
             {onRequestAssign ? (
               <Button
                 variant="secondary"
