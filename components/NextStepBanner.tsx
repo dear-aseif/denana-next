@@ -19,15 +19,12 @@ export default function NextStepBanner({
   href: string;
 }) {
   return (
-    <Card className="cc-next dash-next">
-      <div className="dash-next-row">
-        <span className="dash-next-ico" aria-hidden="true">🧭</span>
-        <div className="cc-next-text">
-          <p className="cc-next-label">Next step</p>
-          <p className="cc-next-title">{title}</p>
-        </div>
+    <Card className="cc-next">
+      <div className="cc-next-text">
+        <p className="cc-next-label">Next step</p>
+        <p className="cc-next-title">{title}</p>
       </div>
-      <Button href={href} variant="secondary" size="small">{cta} &rarr;</Button>
+      <Button href={href}>{cta} &rarr;</Button>
     </Card>
   );
 }

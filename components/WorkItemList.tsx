@@ -9,37 +9,19 @@ import StatusBadge from './StatusBadge';
  * assignee, and a status badge. Reads from the Phase 16B WorkItem shape and
  * never mutates data.
  */
-const WI_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-/** Locale-free short date from an ISO yyyy-mm-dd string (avoids timezone drift). */
-function wiShortDate(iso?: string | null): string {
-  if (!iso) return '';
-  const parts = iso.slice(0, 10).split('-');
-  if (parts.length < 3) return '';
-  const m = Number(parts[1]);
-  const d = Number(parts[2]);
-  if (!m || !d) return '';
-  return WI_MONTHS[m - 1] + ' ' + d;
-}
-
 export default function WorkItemList({ items }: { items: WorkItem[] }) {
   return (
     <ul className="wi-list">
       {items.map((item) => {
-        const time = item.scheduledTime || '';
-        const date = wiShortDate(item.scheduledDate);
+        const meta: React.ReactNode[] = [];
+        if (item.campaignName) meta.push(<span key="c" className="wi-meta-item">{item.campaignName}</span>);
+        if (item.scheduledTime) meta.push(<span key="t" className="wi-meta-item">{item.scheduledTime}</span>);
+        if (item.assignee) meta.push(<span key="a" className="wi-meta-item wi-assignee">{item.assignee}</span>);
         return (
           <li key={item.id} className="wi-row">
-            <div className="wi-time">
-              <span className="wi-time-val">{time || date || '—'}</span>
-              {time && date ? <span className="wi-time-date">{date}</span> : null}
-            </div>
             <div className="wi-main">
               <p className="wi-title">{item.topicTitle || 'Untitled content'}</p>
-              <div className="wi-meta">
-                {item.campaignName ? <span className="wi-meta-item">{item.campaignName}</span> : null}
-                {item.assignee ? <span className="wi-meta-item wi-assignee">{item.assignee}</span> : null}
-              </div>
+              {meta.length > 0 && <div className="wi-meta">{meta}</div>}
             </div>
             <StatusBadge status={item.productionStatus} />
           </li>

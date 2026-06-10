@@ -22,19 +22,11 @@ export default function DashboardStatGrid({
   total: number;
   stats: DashboardStat[];
 }) {
-  const safeTotal = Math.max(total, 1);
   return (
-    <div className="cc-progress dash-stats">
+    <div className="cc-progress">
       <div className="cc-total">
         <span className="cc-total-num">{total}</span>
         <span className="cc-total-label">total content</span>
-      </div>
-      <div className="cc-progress-bar" aria-hidden="true">
-        {stats.map((s) => {
-          if (s.value <= 0) return null;
-          const segStyle: React.CSSProperties = { width: (s.value / safeTotal) * 100 + '%' };
-          return <span key={s.key} className={'cc-progress-seg tone-' + s.tone} style={segStyle} />;
-        })}
       </div>
       <ul className="cc-progress-list">
         {stats.map((s) => (
