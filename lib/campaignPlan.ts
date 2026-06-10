@@ -127,7 +127,13 @@ export function buildPlan(brand: BrandSnapshot | null, input: WizardInput): Buil
 
   // Reuse the existing generator. It returns one row per day across the period
   // (already Planning, with null scheduling), so its length is the true span.
-  const dailyRows = generateCalendar(brand, campaign);
+  const dailyRows = generateCalendar(brand, campaign, {
+    goalAware: true,
+    goal: input.goal,
+    focus: input.focusName,
+    focusDesc: input.focusDesc,
+    platforms: input.platforms,
+  });
   const dayCount = dailyRows.length;
   if (dayCount === 0) {
     return { campaign, rows: [], estimatedCount: 0, dayCount: 0 };

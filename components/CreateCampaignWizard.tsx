@@ -496,6 +496,9 @@ export default function CreateCampaignWizard({
                 </div>
               </div>
               <p className="wiz-note">
+                Your content will be tailored to your goal and selected platforms.
+              </p>
+              <p className="wiz-note">
                 Content is added to the Content Planner as <strong>Planning</strong>.
                 Nothing is scheduled to the Work Calendar automatically — you choose
                 what to schedule later.

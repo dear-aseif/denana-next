@@ -22,6 +22,13 @@ import type {
   ContentDetail,
 } from '@/types/content';
 import { toISO, dayName, uid } from './utils';
+import {
+  getGoalStrategy,
+  getPlatformStrategy,
+  buildGoalAwareCTA,
+  buildGoalAwareTopic,
+  type GoalStrategy,
+} from './goalStrategy';
 
 /* ============================================================
    BATCH 3 — Content variation helpers (deterministic, no AI)
@@ -140,10 +147,25 @@ function campaignDayCount(campaign: Campaign | null): number {
   return 30;
 }
 
+/* Phase 16H: optional goal/platform/focus aware generation. When goalAware is
+ * not set, generateCalendar behaves exactly as before (legacy fallback), so
+ * existing campaigns and the My Campaign flow are unaffected. */
+export interface GenerateOptions {
+  goalAware?: boolean;
+  goal?: string;
+  focus?: string;
+  focusDesc?: string;
+  platforms?: string[];
+}
+
 export function generateCalendar(
   _brand: BrandSnapshot | null,
   campaign: Campaign | null,
+  opts?: GenerateOptions,
 ): ContentRow[] {
+  if (opts && opts.goalAware) {
+    return generateGoalAwareCalendar(_brand, campaign, opts);
+  }
   const dayCount = campaignDayCount(campaign);
   const buckets = PILLAR_PLAN.map((p) => ({ pillar: p.pillar, n: p.count }));
   const sequence: string[] = [];
@@ -233,6 +255,89 @@ export function generateCalendar(
       hook: item.h,
       cta,
       objective,
+      productionStatus: 'Planning',
+      scheduledDate: null,
+      scheduledTime: null,
+      assignee: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+  return rows;
+}
+
+/* ============================================================
+   PHASE 16H — Goal-Aware Calendar
+   Uses Create Campaign Wizard metadata (goal / focus / platforms) to bias the
+   pillar mix + angle arc, topic selection, content format, CTA, and objective.
+   Falls back to the legacy generator above when goalAware is not requested.
+   Generated copy stays Bahasa Indonesia; only the STRATEGY is goal-aware.
+   ============================================================ */
+function generateGoalAwareCalendar(
+  _brand: BrandSnapshot | null,
+  campaign: Campaign | null,
+  opts: GenerateOptions,
+): ContentRow[] {
+  const dayCount = campaignDayCount(campaign);
+  const goal = opts.goal || (campaign ? String(campaign.campaignGoal || '') : '');
+  const focus =
+    opts.focus || (campaign && campaign.priorityService ? campaign.priorityService : '');
+  const platforms =
+    opts.platforms && opts.platforms.length
+      ? opts.platforms
+      : campaign && campaign.mainPlatform
+        ? campaign.mainPlatform.split(',').map((s) => s.trim()).filter(Boolean)
+        : [];
+
+  const strategy: GoalStrategy = getGoalStrategy(goal);
+  const platformStrategy = getPlatformStrategy(platforms);
+  const seq = strategy.pillarSequence;
+
+  const topicCursor: Record<string, number> = {};
+  PILLARS.forEach((p) => {
+    topicCursor[p] = 0;
+  });
+
+  let start =
+    campaign && campaign.periodStart
+      ? new Date(campaign.periodStart + 'T00:00:00')
+      : new Date();
+  if (isNaN(start.getTime())) start = new Date();
+
+  const rows: ContentRow[] = [];
+  for (let i = 0; i < dayCount; i++) {
+    const pillar = seq[i % seq.length] || 'Edukasi Facial';
+    const item = buildGoalAwareTopic(pillar, topicCursor[pillar] || 0, focus);
+    topicCursor[pillar] = (topicCursor[pillar] || 0) + 1;
+
+    const d = new Date(start.getTime());
+    d.setDate(start.getDate() + i);
+
+    // Platform-aware format, preserving the "no 3 Reels in a row" guardrail.
+    let format: string =
+      platformStrategy.formatPool[i % platformStrategy.formatPool.length] || item.f;
+    if (
+      format === 'Reels' &&
+      rows.length >= 2 &&
+      rows[rows.length - 1].format === 'Reels' &&
+      rows[rows.length - 2].format === 'Reels'
+    ) {
+      format = 'Carousel';
+    }
+
+    const cta = buildGoalAwareCTA(strategy.goal, platforms, focus, i);
+
+    const now = new Date().toISOString();
+    rows.push({
+      id: uid(),
+      date: toISO(d),
+      day: dayName(d),
+      format,
+      pillar,
+      topicTitle: item.t,
+      hook: item.h,
+      cta,
+      objective: strategy.objective,
       productionStatus: 'Planning',
       scheduledDate: null,
       scheduledTime: null,
