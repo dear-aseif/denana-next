@@ -516,7 +516,7 @@ export function getPlatformDetailStrategy(platforms?: string[]): PlatformDetailS
   let primary: PlatformDetailStrategy['primary'] = 'general';
   for (const k of priority) {
     if (keys.includes(k)) {
-      primary = k;
+      primary = k as PlatformDetailStrategy['primary'];
       break;
     }
   }
