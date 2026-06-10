@@ -12,7 +12,7 @@ import type { BrandSnapshot, ContentDetail, ContentRow } from '@/types/content';
 import { pillarShort } from '@/data/sampleContent';
 import { generateDetail, detailTexts } from '@/lib/generator';
 import { fmtDate, fmtDateTime } from '@/lib/utils';
-import { getDraft, putDraft } from '@/lib/storage';
+import { getDraft, putDraft, getCampaigns, getActiveCampaignRecord } from '@/lib/storage';
 import { copyText } from '@/lib/exportUtils';
 import { getContentStatusLabel, normalizeContentStatus } from '@/lib/labels';
 import { useToast } from './ToastProvider';
@@ -24,6 +24,7 @@ const noteTopStyle: React.CSSProperties = { marginTop: 6 };
 const bannerStyle: React.CSSProperties = { margin: '0 0 16px' };
 const h2Style: React.CSSProperties = { marginTop: 8 };
 const scriptBoxStyle: React.CSSProperties = { whiteSpace: 'normal' };
+const genUsingStyle: React.CSSProperties = { marginTop: 4, fontSize: 12, opacity: 0.7 };
 
 function isValidDetail(d: ContentDetail | null | undefined): d is ContentDetail {
   return !!(
@@ -89,11 +90,34 @@ export default function DetailModal({
 }) {
   const toast = useToast();
   const existingDraft = useMemo(() => getDraft(row.id), [row.id]);
+  // Phase 16I: resolve the campaign behind this row (by campaignId, else the
+  // active campaign) so caption/script can be goal/platform/focus aware. When no
+  // campaign metadata is available, detailOpts is undefined and generateDetail
+  // safely falls back to its generic output.
+  const detailOpts = useMemo(() => {
+    const recs = getCampaigns();
+    let rec = row.campaignId ? recs.find((r) => r.id === row.campaignId) : undefined;
+    if (!rec) rec = getActiveCampaignRecord() || undefined;
+    const c = rec ? rec.campaign : null;
+    if (!c) return undefined;
+    const platforms = c.mainPlatform
+      ? c.mainPlatform.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+    const goal = typeof c.campaignGoal === 'string' ? c.campaignGoal : '';
+    const focus = c.priorityService || '';
+    if (!goal && !focus && platforms.length === 0) return undefined;
+    return { goal, platforms, focus, focusDesc: c.notes || '' };
+  }, [row.campaignId]);
+  const genUsing = detailOpts
+    ? [detailOpts.goal, detailOpts.platforms.join(', '), detailOpts.focus]
+        .filter(Boolean)
+        .join(' \u00b7 ')
+    : '';
   const [fromDraft, setFromDraft] = useState<boolean>(!!existingDraft);
   const [savedAt, setSavedAt] = useState<string | undefined>(existingDraft?.savedAt);
   const [detail, setDetail] = useState<ContentDetail>(() => {
-    const initial = existingDraft ? existingDraft.detail : generateDetail(row, brand);
-    return isValidDetail(initial) ? initial : generateDetail(row, brand);
+    const initial = existingDraft ? existingDraft.detail : generateDetail(row, brand, detailOpts);
+    return isValidDetail(initial) ? initial : generateDetail(row, brand, detailOpts);
   });
 
   useEffect(() => {
@@ -117,7 +141,7 @@ export default function DetailModal({
         'Regenerate this content from the idea? Your saved draft stays unchanged until you press Save Draft.',
       )
     ) {
-      setDetail(generateDetail(row, brand));
+      setDetail(generateDetail(row, brand, detailOpts));
       setFromDraft(false);
       toast('Content regenerated');
     }
@@ -172,6 +196,11 @@ export default function DetailModal({
                 </span>
               ) : null}
             </div>
+            {genUsing ? (
+              <div className="meta" style={genUsingStyle}>
+                Generated using: {genUsing}
+              </div>
+            ) : null}
           </div>
           <button className="x-btn" onClick={onClose} aria-label="Close">
             ×

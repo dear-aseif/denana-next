@@ -20,11 +20,15 @@ import type {
   Campaign,
   ContentRow,
   ContentDetail,
+  ContentScript,
+  ScriptScene,
 } from '@/types/content';
 import { toISO, dayName, uid } from './utils';
 import {
   getGoalStrategy,
   getPlatformStrategy,
+  getGoalCaptionStrategy,
+  getPlatformDetailStrategy,
   buildGoalAwareCTA,
   buildGoalAwareTopic,
   type GoalStrategy,
@@ -352,10 +356,24 @@ function generateGoalAwareCalendar(
 /* ============================================================
    MOCK GENERATOR — Content Detail
    ============================================================ */
+/* Phase 16I: optional goal/platform/focus context for detail generation. When
+ * omitted (or empty), generateDetail behaves exactly as before (generic
+ * fallback), so legacy rows/campaigns and existing saved drafts are unaffected. */
+export interface DetailOptions {
+  goal?: string;
+  platforms?: string[];
+  focus?: string;
+  focusDesc?: string;
+}
+
 export function generateDetail(
   row: ContentRow,
   brand: BrandSnapshot | null,
+  opts?: DetailOptions,
 ): ContentDetail {
+  if (opts && (opts.goal || opts.focus || (opts.platforms && opts.platforms.length))) {
+    return generateGoalAwareDetail(row, brand, opts);
+  }
   const b = brand || ({} as Partial<BrandSnapshot>);
   const price = b.entryPrice || 'Rp350.000';
   const pillar = row.pillar;
@@ -497,6 +515,236 @@ export function generateDetail(
       'Gunakan review customer asli dan minta izin sebelum menampilkan foto/video.',
     );
   }
+
+  return {
+    caption,
+    shortCaption,
+    script,
+    visualDirection,
+    overlayOptions,
+    hashtags: tags,
+    checklist,
+  };
+}
+
+/* ============================================================
+   PHASE 16I — Goal-Aware Content Detail
+   Builds caption + script that reflect the campaign goal, selected platforms,
+   product/service focus, and the row's own format / pillar / hook / CTA.
+   Falls back to the generic generateDetail above when no campaign metadata is
+   available. Existing saved drafts are never auto-regenerated (the modal loads
+   them as-is), so they stay byte-for-byte safe. Copy stays Bahasa Indonesia;
+   only the STRATEGY is goal/platform/focus aware.
+   ============================================================ */
+function buildGoalAwareScript(
+  format: string,
+  plat: ReturnType<typeof getPlatformDetailStrategy>,
+  ts: { scene2Visual: string; scene3Visual: string; scene3VO: string; overlay3: string },
+  parts: {
+    hook: string;
+    topic: string;
+    intro: string;
+    cta: string;
+    focusMention: string;
+    price: string;
+    isBookingOrSales: boolean;
+    isEngagement: boolean;
+    isEducation: boolean;
+    isTrust: boolean;
+  },
+): ContentScript {
+  if (format === 'Carousel') {
+    const slides: ScriptScene[] = [
+      { time: 'Slide 1', voiceover: parts.hook, visual: 'Cover: judul besar + visual ' + parts.focusMention + ' yang menarik perhatian.', overlayText: parts.hook },
+      { time: 'Slide 2', voiceover: 'Kenapa ini penting buat kamu?', visual: 'Gambarkan masalah / kebutuhan kulit secara halus.', overlayText: parts.topic },
+      { time: 'Slide 3', voiceover: 'Apa itu ' + parts.focusMention + '?', visual: 'Penjelasan singkat dengan ikon atau foto proses.', overlayText: parts.intro },
+      { time: 'Slide 4', voiceover: parts.isBookingOrSales ? 'Manfaat & kenapa cocok buat kamu' : 'Hal yang perlu kamu tahu', visual: 'Tampilkan 3 poin singkat yang mudah dibaca.', overlayText: 'Poin penting' },
+      { time: 'Slide 5', voiceover: parts.isEducation ? 'Mitos vs Fakta' : 'Bagaimana prosesnya', visual: ts.scene3Visual, overlayText: ts.overlay3 },
+      { time: 'Slide 6', voiceover: parts.isTrust ? 'Cerita & kepercayaan customer' : 'Tips singkat biar makin yakin', visual: 'Tampilkan proof / tips ringkas (boleh kutipan customer dengan izin).', overlayText: 'Biar makin yakin' },
+      { time: 'Slide 7', voiceover: parts.cta, visual: 'Slide penutup: CTA jelas + info kontak / cara booking.', overlayText: parts.cta },
+    ];
+    return { opening: parts.hook, sceneByScene: slides, closingCTA: parts.cta };
+  }
+  if (format === 'Stories') {
+    const frames: ScriptScene[] = [
+      { time: 'Frame 1', voiceover: parts.hook, visual: 'Frame pembuka: teks hook di atas foto / klip singkat.', overlayText: parts.hook },
+      { time: 'Frame 2', voiceover: parts.intro, visual: 'Frame info singkat tentang ' + parts.focusMention + '.', overlayText: parts.topic },
+      { time: 'Frame 3', voiceover: parts.isEngagement ? 'Pakai sticker poll / question: "Kamu tim yang mana?"' : 'Tampilkan proses singkat atau hasil yang nyaman.', visual: parts.isEngagement ? 'Tambahkan sticker interaktif (poll / question box).' : ts.scene3Visual, overlayText: parts.isEngagement ? 'Jawab di sticker ya!' : ts.overlay3 },
+      { time: 'Frame 4', voiceover: parts.cta, visual: 'Frame CTA: sticker link / "ketuk untuk chat".', overlayText: parts.cta },
+    ];
+    return { opening: parts.hook, sceneByScene: frames, closingCTA: parts.cta };
+  }
+  if (format === 'Single Post') {
+    if (plat.primary === 'website') {
+      const sections: ScriptScene[] = [
+        { time: 'Bagian 1 \u2014 Intro', voiceover: parts.hook, visual: 'Paragraf pembuka yang memperkenalkan ' + parts.focusMention + '.', overlayText: 'Pendahuluan' },
+        { time: 'Bagian 2 \u2014 Penjelasan', voiceover: 'Apa itu ' + parts.focusMention + ' dan manfaatnya', visual: 'Uraikan secara terstruktur dengan sub-poin.', overlayText: 'Penjelasan' },
+        { time: 'Bagian 3 \u2014 Untuk Siapa', voiceover: 'Siapa yang cocok dan kapan sebaiknya treatment', visual: 'Bullet list singkat.', overlayText: 'Cocok untuk' },
+        { time: 'Bagian 4 \u2014 FAQ', voiceover: '2\u20133 pertanyaan umum + jawaban singkat', visual: 'Format tanya-jawab.', overlayText: 'FAQ' },
+        { time: 'Bagian 5 \u2014 Penutup', voiceover: parts.cta, visual: 'Ringkas + ajakan + info kontak / booking.', overlayText: parts.cta },
+      ];
+      return { opening: parts.hook, sceneByScene: sections, closingCTA: parts.cta };
+    }
+    const single: ScriptScene[] = [
+      { time: 'Caption', voiceover: 'Pakai caption di atas sebagai teks utama postingan.', visual: 'Satu visual kuat: foto ' + parts.focusMention + ' atau suasana salon yang bersih.', overlayText: parts.hook },
+      { time: 'Visual', voiceover: parts.intro, visual: 'Opsional: 1 foto pendukung (before/after halus atau alat yang bersih).', overlayText: ts.overlay3 },
+      { time: 'CTA', voiceover: parts.cta, visual: 'Pastikan CTA terlihat jelas di caption & desain.', overlayText: parts.cta },
+    ];
+    return { opening: parts.hook, sceneByScene: single, closingCTA: parts.cta + (parts.isBookingOrSales ? ' \u2014 mulai ' + parts.price + '.' : '') };
+  }
+  // Reels / Live (video) — also the default fallback.
+  const openVisual = plat.usesTikTok
+    ? 'Wajah bicara langsung ke kamera + teks hook besar. Hook harus nendang di 1 detik pertama.'
+    : 'Close-up wajah customer yang tenang / teks hook di layar dengan nuansa putih lembut.';
+  const scenes: ScriptScene[] = [
+    { time: '0\u20133 dtk', visual: openVisual, voiceover: parts.hook, overlayText: parts.hook },
+    { time: '4\u201310 dtk', visual: parts.isEngagement ? 'Tunjukkan situasi relatable / ajak penonton menebak, lalu transisi ke salon.' : ts.scene2Visual, voiceover: parts.intro, overlayText: parts.isEngagement ? 'Kamu yang mana?' : 'Kenali dulu kebutuhan wajahmu' },
+    { time: '11\u201320 dtk', visual: ts.scene3Visual, voiceover: ts.scene3VO, overlayText: ts.overlay3 },
+    { time: '21\u201330 dtk', visual: 'Tutup dengan suasana hangat + teks CTA.', voiceover: parts.cta + ' Hasil bisa berbeda pada setiap orang, konsultasikan dulu ya.', overlayText: parts.cta },
+  ];
+  return { opening: parts.hook, sceneByScene: scenes, closingCTA: parts.cta + (parts.isBookingOrSales ? ' \u2014 facial treatment mulai ' + parts.price + '.' : '') };
+}
+
+function generateGoalAwareDetail(
+  row: ContentRow,
+  brand: BrandSnapshot | null,
+  opts: DetailOptions,
+): ContentDetail {
+  const b = brand || ({} as Partial<BrandSnapshot>);
+  const price = b.entryPrice || 'Rp350.000';
+  const pillar = row.pillar;
+  const topic = row.topicTitle;
+  const hook = row.hook;
+  const focus = (opts.focus || '').trim();
+
+  const goalStrat = getGoalStrategy(opts.goal);
+  const cap = getGoalCaptionStrategy(opts.goal);
+  const plat = getPlatformDetailStrategy(opts.platforms);
+
+  const isBookingOrSales = goalStrat.goal === 'Booking' || goalStrat.goal === 'Sales';
+  const isEngagement = goalStrat.goal === 'Engagement';
+  const isEducation = goalStrat.goal === 'Education';
+  const isTrust = goalStrat.goal === 'Trust Building';
+
+  // Caption treatment prefers the campaign focus; script visuals fall back to
+  // the row topic/hook when the focus is generic.
+  const focusTreatment = focus ? detectTreatment(focus) : 'General';
+  const topicTreatment = detectTreatment(topic + ' ' + hook);
+  const captionTreatment = focusTreatment !== 'General' ? focusTreatment : topicTreatment;
+  const scriptTreatment = topicTreatment !== 'General' ? topicTreatment : captionTreatment;
+
+  const seed = variationSeed(topic + '|' + goalStrat.goal + '|' + plat.primary);
+  const ts = TREATMENT_SCRIPT[scriptTreatment];
+  const body = CAPTION_BODIES[seed % CAPTION_BODIES.length];
+  const treatmentLine = TREATMENT_CAPTION_LINE[captionTreatment];
+  const reassure = REASSURE_LINES[(seed + 1) % REASSURE_LINES.length];
+
+  const opener = cap.openers[seed % cap.openers.length];
+  const bodyLead = cap.bodyLeads[seed % cap.bodyLeads.length];
+  const closer = cap.closers[(seed + 1) % cap.closers.length];
+  const focusMention = focus || 'facial treatment';
+  const cta = row.cta;
+
+  const priceLine = isBookingOrSales ? '\nFacial treatment mulai ' + price + '.' : '';
+
+  const longCaption =
+    opener + ' ' + hook + '\n\n' +
+    topic + '. ' + bodyLead + '\n\n' +
+    body + (treatmentLine ? ' ' + treatmentLine : '') + '\n\n' +
+    reassure + '\n\n' +
+    closer + '\n' + cta + priceLine + '\n\n' +
+    '\ud83d\udccd Kota Bima, NTB dan sekitarnya';
+
+  let caption = longCaption;
+  if (plat.captionLength === 'short') {
+    caption =
+      hook + '\n\n' +
+      topic + '. ' + bodyLead + '\n\n' +
+      (treatmentLine ? treatmentLine + '\n\n' : '') +
+      closer + '\n' + cta + priceLine;
+  }
+
+  let shortCaption: string;
+  if (plat.usesWhatsApp) {
+    shortCaption = 'Halo kak \ud83d\udc4b ' + topic + '. ' + cta;
+  } else if (isBookingOrSales) {
+    shortCaption = hook + ' ' + cta + ' Mulai ' + price + '. \u2728';
+  } else if (isEngagement) {
+    shortCaption = hook + ' ' + cta;
+  } else {
+    shortCaption = hook + ' ' + cta + ' \u2728';
+  }
+
+  const intro = isEngagement
+    ? 'Banyak yang ngalamin hal serupa \u2014 yuk bahas bareng.'
+    : isEducation
+      ? 'Biar makin paham, kita jelaskan pelan-pelan.'
+      : isTrust
+        ? 'Kami jelaskan prosesnya supaya kamu makin tenang.'
+        : isBookingOrSales
+          ? 'Ini yang bisa kamu rasakan dan cara mudah memulainya.'
+          : 'Kita kenalan dulu pelan-pelan biar gampang dipahami.';
+
+  const script = buildGoalAwareScript(row.format, plat, ts, {
+    hook,
+    topic,
+    intro,
+    cta,
+    focusMention,
+    price,
+    isBookingOrSales,
+    isEngagement,
+    isEducation,
+    isTrust,
+  });
+
+  const visualDirection =
+    'Gaya clean minimal dengan nuansa putih dan sentuhan gold. Pencahayaan terang dan lembut, suasana salon yang tenang dan bersih. ' +
+    plat.styleNote + ' ' +
+    (isTrust
+      ? 'Tonjolkan kebersihan alat dan transparansi proses. '
+      : isEngagement
+        ? 'Sertakan elemen yang memancing interaksi (pertanyaan / teks ajakan). '
+        : isBookingOrSales
+          ? 'Tonjolkan kenyamanan dan hasil yang natural, sertakan info booking yang jelas. '
+          : 'Gunakan visual sederhana yang mudah direkam dengan smartphone. ') +
+    'Hindari kesan klinis atau menakutkan.';
+
+  const overlayOptions = [
+    hook,
+    ts.overlay3,
+    isEngagement ? 'Kamu tim yang mana?' : 'Kenali dulu kebutuhan wajahmu',
+    isBookingOrSales ? 'Mulai ' + price : focusMention,
+    cta,
+  ];
+
+  let tags = HASHTAG_BANK.slice(0, 10);
+  if (pillar === 'Promo & Booking')
+    tags = ['#DenanavBeautySalon', '#FacialBima', '#SalonBima', '#FacialTreatment', '#FacialKotaBima', '#PerawatanWajah', '#glowingskin', '#kulitsehat', '#kecantikan', '#facialmurah'];
+  if (pillar === 'Pengalaman Treatment')
+    tags = ['#DenanavBeautySalon', '#FacialTreatment', '#HydraPeel', '#Microdermabrasion', '#TotokWajah', '#FacialBima', '#glowingskin', '#kulitsehat', '#PerawatanWajah', '#perawatanwajah'];
+  if (!plat.heavyHashtags) tags = tags.slice(0, 5);
+
+  const checklist = [
+    'Siapkan ruang treatment yang bersih dan rapi.',
+    'Pastikan pencahayaan terang dan lembut (cahaya natural lebih baik).',
+    'Rekam dengan smartphone dalam mode stabil / pakai tripod kecil.',
+    'Tampilkan proses facial secara halus, tidak terburu-buru.',
+    'Tambahkan teks overlay sesuai pilihan di atas.',
+    'Periksa ulang caption: hindari klaim medis & janji hasil pasti.',
+  ];
+  if (pillar === 'Testimoni & Kepercayaan' || isTrust)
+    checklist.unshift('Gunakan review customer asli dan minta izin sebelum menampilkan foto/video.');
+  if (row.format === 'Carousel')
+    checklist.push('Pastikan tiap slide punya satu poin utama yang mudah dibaca.');
+  if (row.format === 'Stories')
+    checklist.push('Siapkan sticker interaktif (poll / question) bila perlu.');
+  if (isEngagement)
+    checklist.push('Tambahkan pertanyaan / ajakan komentar untuk memancing interaksi.');
+  if (isBookingOrSales)
+    checklist.push('Pastikan info slot, jadwal, dan cara booking jelas.');
+  if (plat.usesWhatsApp)
+    checklist.push('Siapkan template pesan WhatsApp / link wa.me untuk mempermudah booking.');
 
   return {
     caption,

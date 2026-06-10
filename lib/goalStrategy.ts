@@ -322,3 +322,217 @@ export function buildGoalAwareTopic(
   }
   return bank[cursor % bank.length];
 }
+
+/* ============================================================
+   PHASE 16I — Detail (caption / script) strategy
+   Maps the campaign goal to a caption TONE + opener / lead / closer lines, and
+   maps selected platforms to a caption length + style note. Reused by
+   generateDetail to build goal/platform-aware captions & scripts. All copy
+   fragments are Bahasa Indonesia to match the existing generator output.
+   ============================================================ */
+
+export type CtaTone =
+  | 'soft'
+  | 'conversational'
+  | 'direct'
+  | 'conversion'
+  | 'helpful'
+  | 'consultative';
+
+export interface GoalCaptionStrategy {
+  goal: CanonicalGoal;
+  ctaTone: CtaTone;
+  /** Goal-flavored opening line placed before the row hook. */
+  openers: string[];
+  /** Goal-flavored lead sentence introducing the caption body. */
+  bodyLeads: string[];
+  /** Goal-flavored nudge line placed just before the row CTA. */
+  closers: string[];
+}
+
+const GOAL_CAPTION_STRATEGIES: Record<CanonicalGoal, GoalCaptionStrategy> = {
+  Awareness: {
+    goal: 'Awareness',
+    ctaTone: 'soft',
+    openers: [
+      'Kenalan dulu yuk.',
+      'Banyak yang belum tahu soal ini.',
+      'Biar makin paham, simak pelan-pelan ya.',
+    ],
+    bodyLeads: [
+      'Sebenarnya merawat wajah itu nggak serumit yang dibayangkan.',
+      'Yuk pahami dasarnya dulu sebelum memilih treatment.',
+      'Ini hal sederhana yang sering kelewat soal perawatan kulit.',
+    ],
+    closers: [
+      'Semoga info ini bermanfaat ya.',
+      'Simpan dulu siapa tahu butuh nanti.',
+      'Pelan-pelan aja, yang penting kenali kebutuhan kulitmu.',
+    ],
+  },
+  Engagement: {
+    goal: 'Engagement',
+    ctaTone: 'conversational',
+    openers: [
+      'Jujur, kamu tim yang mana?',
+      'Pernah ngalamin ini juga nggak?',
+      'Coba tebak, lebih sering yang mana?',
+    ],
+    bodyLeads: [
+      'Kita bahas bareng yuk, soalnya tiap kulit beda-beda.',
+      'Banyak yang relate sama hal ini.',
+      'Penasaran nggak kenapa ini bisa terjadi?',
+    ],
+    closers: [
+      'Cerita pengalamanmu di komentar ya.',
+      'Tulis jawabanmu dulu, nanti kita bahas.',
+      'Penasaran sama jawaban yang lain? Komen punyamu dulu.',
+    ],
+  },
+  Booking: {
+    goal: 'Booking',
+    ctaTone: 'direct',
+    openers: [
+      'Lagi cari waktu buat merawat wajah?',
+      'Kalau kamu lagi mempertimbangkan treatment, ini buat kamu.',
+      'Siap kasih wajahmu perawatan yang pas?',
+    ],
+    bodyLeads: [
+      'Ini manfaat yang bisa kamu rasakan dan apa yang terjadi selama treatment.',
+      'Biar nggak ragu, ini gambaran prosesnya dari awal sampai selesai.',
+      'Buat kamu yang masih maju-mundur, ini alasan kenapa enaknya mulai sekarang.',
+    ],
+    closers: [
+      'Slot tiap minggunya terbatas, jadi enaknya diatur dari sekarang.',
+      'Tinggal pilih waktu yang pas buat kamu.',
+      'Kami bantu siapkan jadwal yang nyaman buat kamu.',
+    ],
+  },
+  Sales: {
+    goal: 'Sales',
+    ctaTone: 'conversion',
+    openers: [
+      'Ada kabar baik buat kamu yang lagi cari perawatan wajah.',
+      'Penawaran ini sayang kalau dilewatkan.',
+      'Buat kamu yang nunggu waktu yang pas, ini dia.',
+    ],
+    bodyLeads: [
+      'Ini nilai yang kamu dapat dari paketnya.',
+      'Biar makin jelas, ini rincian manfaat dan penawarannya.',
+      'Bukan cuma soal harga, ini soal apa yang kamu dapatkan.',
+    ],
+    closers: [
+      'Penawarannya berlaku terbatas ya.',
+      'Kabari kami sebelum slot atau promonya habis.',
+      'Yuk manfaatkan selagi masih tersedia.',
+    ],
+  },
+  Education: {
+    goal: 'Education',
+    ctaTone: 'helpful',
+    openers: [
+      'Catat ya, ini penting buat kesehatan kulitmu.',
+      'Biar nggak salah langkah, simak panduan singkat ini.',
+      'Sering ketuker, ini penjelasan yang benar.',
+    ],
+    bodyLeads: [
+      'Berikut penjelasan sederhananya, langkah demi langkah.',
+      'Mari pisahkan mitos dan faktanya.',
+      'Ini hal-hal yang sebaiknya kamu tahu sebelum treatment.',
+    ],
+    closers: [
+      'Simpan panduan ini biar gampang dicari lagi.',
+      'Bagikan ke teman yang lagi butuh info ini.',
+      'Kalau masih bingung, jangan ragu tanya ya.',
+    ],
+  },
+  'Trust Building': {
+    goal: 'Trust Building',
+    ctaTone: 'consultative',
+    openers: [
+      'Kepercayaanmu adalah hal yang kami jaga.',
+      'Biar kamu makin tenang, ini cara kami bekerja.',
+      'Transparansi itu penting buat kami.',
+    ],
+    bodyLeads: [
+      'Kami selalu mengutamakan kebersihan, kenyamanan, dan kejelasan proses.',
+      'Kamu berhak tahu apa yang terjadi sebelum, selama, dan sesudah treatment.',
+      'Setiap langkah kami jelaskan supaya kamu merasa aman.',
+    ],
+    closers: [
+      'Kalau masih ada yang ingin ditanyakan, konsultasi dulu nggak apa-apa.',
+      'Kami senang menjawab pertanyaanmu sebelum kamu memutuskan.',
+      'Tanya dulu sepuasnya, baru ambil keputusan.',
+    ],
+  },
+};
+
+export function getGoalCaptionStrategy(goal?: string): GoalCaptionStrategy {
+  return GOAL_CAPTION_STRATEGIES[normalizeGoal(goal)];
+}
+
+/* ---------- Platform detail strategy ---------- */
+
+export interface PlatformDetailStrategy {
+  platforms: string[];
+  usesInstagram: boolean;
+  usesFacebook: boolean;
+  usesTikTok: boolean;
+  usesWhatsApp: boolean;
+  usesWebsite: boolean;
+  /** Most tone-defining selected platform (drives caption length & style). */
+  primary: 'instagram' | 'facebook' | 'tiktok' | 'whatsapp' | 'website' | 'general';
+  /** Suggested caption length, biased by the primary platform. */
+  captionLength: 'short' | 'medium' | 'long';
+  /** Indonesian style note appended to the visual direction. */
+  styleNote: string;
+  /** Whether to include the full hashtag set (IG / TikTok) vs a trimmed set. */
+  heavyHashtags: boolean;
+}
+
+const PLATFORM_STYLE_NOTES: Record<string, string> = {
+  instagram: 'Gaya Instagram: visual-first, mudah di-save dan di-share.',
+  facebook: 'Gaya Facebook: sedikit lebih menjelaskan, ramah komunitas/lokal.',
+  tiktok: 'Gaya TikTok: hook kuat di detik pertama, bahasa santai, to the point.',
+  whatsapp: 'Gaya WhatsApp: pesan singkat, langsung, mudah diteruskan atau dijadikan status.',
+  website: 'Gaya Website/Blog: lebih edukatif dan terstruktur, minim bahasa gaul.',
+  general: 'Gaya bersih dan ramah, mudah dipahami siapa saja.',
+};
+
+export function getPlatformDetailStrategy(platforms?: string[]): PlatformDetailStrategy {
+  const list = Array.isArray(platforms) ? platforms.filter(Boolean) : [];
+  const keys: PlatformKey[] = [];
+  for (const p of list) {
+    const k = platformKey(p);
+    if (k && !keys.includes(k)) keys.push(k);
+  }
+  const usesInstagram = keys.includes('instagram');
+  const usesFacebook = keys.includes('facebook');
+  const usesTikTok = keys.includes('tiktok');
+  const usesWhatsApp = keys.includes('whatsapp');
+  const usesWebsite = keys.includes('website');
+  // Priority order: the most tone-defining platform wins.
+  const priority: PlatformKey[] = ['tiktok', 'whatsapp', 'website', 'instagram', 'facebook'];
+  let primary: PlatformDetailStrategy['primary'] = 'general';
+  for (const k of priority) {
+    if (keys.includes(k)) {
+      primary = k;
+      break;
+    }
+  }
+  let captionLength: 'short' | 'medium' | 'long' = 'medium';
+  if (primary === 'tiktok' || primary === 'whatsapp') captionLength = 'short';
+  else if (primary === 'website') captionLength = 'long';
+  return {
+    platforms: list,
+    usesInstagram,
+    usesFacebook,
+    usesTikTok,
+    usesWhatsApp,
+    usesWebsite,
+    primary,
+    captionLength,
+    styleNote: PLATFORM_STYLE_NOTES[primary] || PLATFORM_STYLE_NOTES.general,
+    heavyHashtags: usesInstagram || usesTikTok || keys.length === 0,
+  };
+}
