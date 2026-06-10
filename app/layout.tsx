@@ -9,6 +9,7 @@ import './globals.css';
 import ToastProvider from '@/components/ToastProvider';
 import RouteBodyClass from '@/components/RouteBodyClass';
 import AppFrame from '@/components/AppFrame';
+import CreateCampaignProvider from '@/components/CreateCampaignProvider';
 
 export const metadata: Metadata = {
   title: 'Denana Next OS',
@@ -22,7 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ToastProvider>
           <RouteBodyClass />
-          <AppFrame>{children}</AppFrame>
+          <CreateCampaignProvider>
+            <AppFrame>{children}</AppFrame>
+          </CreateCampaignProvider>
         </ToastProvider>
       </body>
     </html>

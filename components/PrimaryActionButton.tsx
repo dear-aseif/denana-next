@@ -1,25 +1,27 @@
 'use client';
 
 /*
- * PrimaryActionButton (Phase 16A)
- * The sidebar's main call-to-action ("Create Plan"). Reuses the existing .btn
- * style and links to the campaign planner route.
+ * PrimaryActionButton (Phase 16A / refined Phase 16G)
+ * The sidebar's main call-to-action ("Create Plan"). It now opens the
+ * CreateCampaignWizard modal via the CreateCampaign context instead of
+ * navigating to a separate page, so the guided wizard is available from
+ * anywhere in the app shell. Reuses the existing .btn / .primary-action-btn
+ * styles.
  */
 import React from 'react';
-import Link from 'next/link';
 import Icon from './Icon';
+import { useCreateCampaign } from './CreateCampaignProvider';
 
 export default function PrimaryActionButton({
-  href = '/campaign-setup',
   label = 'Create Plan',
 }: {
-  href?: string;
   label?: string;
 }) {
+  const { openWizard } = useCreateCampaign();
   return (
-    <Link href={href} className="btn primary-action-btn">
+    <button type="button" className="btn primary-action-btn" onClick={openWizard}>
       <Icon name="plus" size={15} />
       <span>{label}</span>
-    </Link>
+    </button>
   );
 }
