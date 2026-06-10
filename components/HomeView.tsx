@@ -17,6 +17,7 @@
  * campaign generation, and Work Calendar helpers are unchanged.
  */
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import type { BrandSnapshot, Campaign, CampaignRecord, ContentRow } from '@/types/content';
 import {
   getBrand,
@@ -34,14 +35,10 @@ import Button from './Button';
 import Card from './Card';
 import PageHeader from './PageHeader';
 import Footer from './Footer';
-import StatusCard from './StatusCard';
 import DashboardStatGrid from './DashboardStatGrid';
 import TodayWorkCard from './TodayWorkCard';
 import NextStepBanner from './NextStepBanner';
 import CampaignSwitcherModal from './CampaignSwitcherModal';
-
-const sectionLabelStyle: React.CSSProperties = { marginBottom: 6, marginTop: 0 };
-const panelHeadStyle: React.CSSProperties = { marginTop: 8, marginBottom: 14 };
 
 export default function HomeView() {
   const [mounted, setMounted] = useState(false);
@@ -124,43 +121,47 @@ export default function HomeView() {
 
   return (
     <>
-      <div className="cc-page">
-        {/* ---- 1. Header / greeting ---- */}
+      <div className="dash-page">
+        {/* ---- 1. Command-center header ---- */}
         <PageHeader
           eyebrow="Command Center"
           title={brand ? `Welcome, ${brand.businessName} 👋` : 'Welcome 👋'}
-          subtitle="See your active campaign, content progress, and next step in one place."
+          subtitle="See your active campaign, content progress, and what needs to happen today."
         />
 
-        {/* ---- 2 + 3. Command grid: primary campaign card + progress ---- */}
-        <div className="cc-grid">
-          {/* 2. Active campaign — the primary working card */}
-          <Card className="cc-panel cc-panel-campaign">
-            <p className="notion-eyebrow" style={sectionLabelStyle}>Active campaign</p>
+        {/* ---- 2 + 3. Primary grid: campaign (main) + rail (progress + next step) ---- */}
+        <div className="dash-primary">
+          {/* Active campaign — primary command card */}
+          <Card className="cc-panel cc-panel-campaign dash-campaign">
+            <div className="dash-card-head">
+              <p className="notion-eyebrow">Active campaign</p>
+              {hasCampaign && campaign && campaigns.length > 1 && (
+                <button type="button" className="dash-switch" onClick={() => setSwitcherOpen(true)}>
+                  Switch &rarr;
+                </button>
+              )}
+            </div>
             {hasCampaign && campaign ? (
-              <>
-                <h3 style={panelHeadStyle}>{campaign.campaignName || 'Untitled campaign'}</h3>
-                <div className="cc-meta">
-                  <div className="cc-meta-row">
-                    <span className="cc-meta-label">Period</span>
-                    <span className="cc-meta-value">{campaign.periodStart} &ndash; {campaign.periodEnd}</span>
+              <div className="dash-campaign-body">
+                <h3 className="dash-campaign-name">{campaign.campaignName || 'Untitled campaign'}</h3>
+                <div className="dash-meta">
+                  <div className="dash-meta-row">
+                    <span className="dash-meta-label">Period</span>
+                    <span className="dash-meta-value">{campaign.periodStart} &ndash; {campaign.periodEnd}</span>
                   </div>
-                  <div className="cc-meta-row">
-                    <span className="cc-meta-label">Goal</span>
-                    <span className="cc-meta-value">{campaign.campaignGoal}</span>
+                  <div className="dash-meta-row">
+                    <span className="dash-meta-label">Goal</span>
+                    <span className="dash-meta-value">{campaign.campaignGoal}</span>
                   </div>
-                  <div className="cc-meta-row">
-                    <span className="cc-meta-label">Frequency</span>
-                    <span className="cc-meta-value">{campaign.postingFrequency}</span>
+                  <div className="dash-meta-row">
+                    <span className="dash-meta-label">Frequency</span>
+                    <span className="dash-meta-value">{campaign.postingFrequency}</span>
                   </div>
                 </div>
-                <div className="cc-panel-cta">
+                <div className="dash-campaign-cta">
                   <Button href="/content-calendar">View content plan &rarr;</Button>
-                  {campaigns.length > 1 && (
-                    <Button variant="secondary" onClick={() => setSwitcherOpen(true)}>Switch campaign</Button>
-                  )}
                 </div>
-              </>
+              </div>
             ) : (
               <div className="cc-panel-empty">
                 <div className="cc-empty-emoji">📣</div>
@@ -170,57 +171,51 @@ export default function HomeView() {
             )}
           </Card>
 
-          {/* 3. Content progress summary */}
-          <Card className="cc-panel cc-panel-progress">
-            <p className="notion-eyebrow" style={sectionLabelStyle}>Content progress</p>
-            {hasCalendar ? (
-              <DashboardStatGrid total={counts.total} stats={statItems} />
-            ) : (
-              <div className="cc-panel-empty">
-                <div className="cc-empty-emoji">🗓️</div>
-                <p className="cc-empty-title">No content plan yet</p>
-                <Button href="/content-calendar">Create content plan &rarr;</Button>
+          {/* Right rail: content progress + next-step guidance */}
+          <div className="dash-rail">
+            <Card className="cc-panel cc-panel-progress dash-progress-card">
+              <div className="dash-card-head">
+                <p className="notion-eyebrow">Content progress</p>
               </div>
-            )}
-          </Card>
+              {hasCalendar ? (
+                <DashboardStatGrid total={counts.total} stats={statItems} />
+              ) : (
+                <div className="cc-panel-empty">
+                  <div className="cc-empty-emoji">🗓️</div>
+                  <p className="cc-empty-title">No content plan yet</p>
+                  <Button href="/content-calendar" variant="secondary" size="small">Create content plan &rarr;</Button>
+                </div>
+              )}
+            </Card>
+
+            <NextStepBanner title={next.title} cta={next.cta} href={next.href} />
+          </div>
         </div>
 
-        {/* ---- 4. Today's / Upcoming work agenda (Work Calendar helper data) ---- */}
-        {hasCalendar && (
+        {/* ---- 4. Operational focus: Today's / Upcoming work ---- */}
+        {hasCalendar ? (
           <TodayWorkCard today={todayWork} upcoming={upcomingWork} />
-        )}
+        ) : null}
 
-        {/* ---- 5. Next step banner (compact main CTA) ---- */}
-        <NextStepBanner title={next.title} cta={next.cta} href={next.href} />
-
-        {/* ---- 6. Main Flow (compact, secondary) ---- */}
-        <section className="cc-flow">
-          <p className="notion-eyebrow" style={sectionLabelStyle}>Main Flow</p>
-          <div className="grid grid-3 cc-flow-grid">
-            <StatusCard
-              compact
-              icon="💄"
-              title="Salon Profile"
-              tone={hasBrand ? 'ok' : 'warn'}
-              pill={hasBrand ? 'Complete' : 'Incomplete'}
-              href="/brand-setup"
-            />
-            <StatusCard
-              compact
-              icon="📅"
-              title="Campaign Plan"
-              tone={hasCampaign ? 'ok' : 'warn'}
-              pill={hasCampaign ? 'Active' : 'None yet'}
-              href="/campaign-setup"
-            />
-            <StatusCard
-              compact
-              icon="🗓️"
-              title="Content Plan"
-              tone={hasCalendar ? 'ok' : 'warn'}
-              pill={hasCalendar ? calendar.length + ' content' : 'Not created'}
-              href="/content-calendar"
-            />
+        {/* ---- 5. Secondary: compact setup-flow strip ---- */}
+        <section className="dash-secondary">
+          <p className="notion-eyebrow dash-secondary-label">Setup flow</p>
+          <div className="dash-flow-strip">
+            <Link href="/brand-setup" className={'dash-flow-chip ' + (hasBrand ? 'is-ok' : 'is-warn')}>
+              <span className="dash-flow-ico" aria-hidden="true">💄</span>
+              <span className="dash-flow-name">Salon Profile</span>
+              <span className="dash-flow-state">{hasBrand ? 'Complete' : 'Incomplete'}</span>
+            </Link>
+            <Link href="/campaign-setup" className={'dash-flow-chip ' + (hasCampaign ? 'is-ok' : 'is-warn')}>
+              <span className="dash-flow-ico" aria-hidden="true">📅</span>
+              <span className="dash-flow-name">Campaign Plan</span>
+              <span className="dash-flow-state">{hasCampaign ? 'Active' : 'None yet'}</span>
+            </Link>
+            <Link href="/content-calendar" className={'dash-flow-chip ' + (hasCalendar ? 'is-ok' : 'is-warn')}>
+              <span className="dash-flow-ico" aria-hidden="true">🗓️</span>
+              <span className="dash-flow-name">Content Plan</span>
+              <span className="dash-flow-state">{hasCalendar ? calendar.length + ' content' : 'Not created'}</span>
+            </Link>
           </div>
         </section>
       </div>
