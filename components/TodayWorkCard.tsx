@@ -4,17 +4,25 @@ import React from 'react';
 import Link from 'next/link';
 import type { WorkItem } from '@/lib/storage';
 import Card from './Card';
-import Button from './Button';
 import WorkItemList from './WorkItemList';
 
 /*
- * TodayWorkCard (Phase 16J-Rev1B)
+ * TodayWorkCard (Phase 16J-Rev2 — neutral)
  * Compact right-rail card. Prefers today's work (getTodayWorkItems); falls back
  * to upcoming work (getUpcomingWorkItems) when nothing is scheduled for today.
- * Shows the first `max` (default 5) items as compact rows, and a small (non
- * dashed) empty state when there is no scheduled work at all. Purely
- * presentational — it receives already-loaded items as props.
+ * Shows the first `max` (default 5) items as compact rows, plus a small,
+ * non-dashed empty state when there is no scheduled work. Neutral styling, with
+ * a plain text link to the Work Calendar. Purely presentational.
  */
+function CalendarIcon() {
+  return (
+    <svg className="hn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="4.5" width="18" height="16" rx="2.5" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M3 9h18M8 2.5v4M16 2.5v4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function TodayWorkCard({
   today,
   upcoming,
@@ -31,33 +39,21 @@ export default function TodayWorkCard({
   const title = showToday ? "Today's Work" : 'Upcoming Work';
 
   return (
-    <Card className="db-rail-card db-today-card">
-      <div className="db-card-head">
-        <div className="db-card-headtext">
-          <span className="db-card-title">🗓️ {title}</span>
-          {hasAny ? (
-            <span className="db-card-sub">
-              {showToday ? 'Scheduled for today' : 'Next up'} &middot; {source.length} item
-              {source.length === 1 ? '' : 's'}
-            </span>
-          ) : null}
-        </div>
-        <Button href="/work-calendar" variant="secondary" size="small">
-          View Work Calendar
-        </Button>
+    <Card className="hn-card hn-today-card">
+      <div className="hn-card-head">
+        <span className="hn-card-title"><CalendarIcon /> {title}</span>
+        <Link className="hn-link" href="/work-calendar">Work Calendar &rarr;</Link>
       </div>
 
       {hasAny ? (
         <WorkItemList items={items} />
       ) : (
-        <div className="db-today-empty">
-          <p className="db-today-empty-title">No work scheduled yet</p>
-          <p className="db-today-empty-text">
+        <div className="hn-today-empty">
+          <p className="hn-today-empty-title">No work scheduled yet</p>
+          <p className="hn-today-empty-text">
             Assign content from Content Planner to start planning daily work.
           </p>
-          <Link className="db-link" href="/content-calendar">
-            Go to Content Planner &rarr;
-          </Link>
+          <Link className="hn-link" href="/content-calendar">Go to Content Planner &rarr;</Link>
         </div>
       )}
     </Card>

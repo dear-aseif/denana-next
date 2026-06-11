@@ -1,22 +1,19 @@
 'use client';
 
 /*
- * CampaignAgendaCard (Phase 16J-Rev1B)
- * Dominant left card of the realigned Dashboard. Shows the ACTIVE campaign's
- * content rows (its content schedule) as a dense, readable agenda sorted by
- * content date. This is a campaign content agenda, NOT a Work Calendar view —
- * rows that are not yet scheduled to the Work Calendar still appear as planned
- * campaign content.
+ * CampaignAgendaCard (Phase 16J-Rev2 — neutral)
+ * Dominant left card of the Homepage. Shows the ACTIVE campaign's content rows
+ * (its content schedule) as a dense, readable agenda sorted by content date.
+ * This is a campaign content agenda, NOT a Work Calendar view — unscheduled
+ * campaign content still appears as planned content.
  *
- * - Header: small icon + active campaign name + a Switch affordance (caret)
- *   when more than one campaign exists. No new date-navigation logic is added.
- * - Status tabs: DISPLAY-ONLY counts for the five canonical statuses
- *   (Planning, Scheduled, In Production, Ready to Post, Posted). No filtering.
- * - Agenda list: date + weekday + pillar chip + topic (+ optional hook) +
- *   status badge per row, with row dividers.
- * - Footer: a "View all" text link routing to the Content Planner.
+ * Neutral SaaS styling (no gold). Header: small neutral line icon + active
+ * campaign name + a Switch affordance and prev/next campaign arrows (wired to
+ * the existing campaign switcher — no new date-navigation logic). Status tabs
+ * are DISPLAY-ONLY counts for the five canonical statuses. Footer: a centered
+ * "View all" link to the Content Planner.
  *
- * Purely presentational: it receives already-loaded rows/counts as props and
+ * Purely presentational: receives already-loaded rows/counts as props and
  * never mutates data or writes to storage.
  */
 import React from 'react';
@@ -33,18 +30,22 @@ export interface AgendaCounts {
   posted: number;
 }
 
-const STATUS_TABS: Array<{
-  key: string;
-  label: string;
-  tone: string;
-  pick: (c: AgendaCounts) => number;
-}> = [
-  { key: 'planning', label: 'Planning', tone: 'planning', pick: (c) => c.planning },
-  { key: 'scheduled', label: 'Scheduled', tone: 'scheduled', pick: (c) => c.scheduled },
-  { key: 'production', label: 'In Production', tone: 'production', pick: (c) => c.inProduction },
-  { key: 'ready', label: 'Ready to Post', tone: 'ready', pick: (c) => c.readyToPost },
-  { key: 'posted', label: 'Posted', tone: 'posted', pick: (c) => c.posted },
+const STATUS_TABS: Array<{ key: string; label: string; pick: (c: AgendaCounts) => number }> = [
+  { key: 'planning', label: 'Planning', pick: (c) => c.planning },
+  { key: 'scheduled', label: 'Scheduled', pick: (c) => c.scheduled },
+  { key: 'production', label: 'In Production', pick: (c) => c.inProduction },
+  { key: 'ready', label: 'Ready to Post', pick: (c) => c.readyToPost },
+  { key: 'posted', label: 'Posted', pick: (c) => c.posted },
 ];
+
+function CalendarIcon() {
+  return (
+    <svg className="hn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="4.5" width="18" height="16" rx="2.5" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M3 9h18M8 2.5v4M16 2.5v4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export default function CampaignAgendaCard({
   campaign,
@@ -52,6 +53,8 @@ export default function CampaignAgendaCard({
   counts,
   canSwitch,
   onSwitch,
+  onPrev,
+  onNext,
   viewAllHref = '/content-calendar',
 }: {
   campaign: Campaign | null;
@@ -59,6 +62,8 @@ export default function CampaignAgendaCard({
   counts: AgendaCounts;
   canSwitch: boolean;
   onSwitch: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
   viewAllHref?: string;
 }) {
   // Sort by content date (ISO yyyy-mm-dd sorts lexically). Copy first so we
@@ -74,67 +79,69 @@ export default function CampaignAgendaCard({
     campaign && campaign.campaignName ? campaign.campaignName : 'No active campaign';
 
   return (
-    <section className="db-agenda">
-      <header className="db-agenda-head">
-        <div className="db-agenda-titlewrap">
-          <span className="db-agenda-icon" aria-hidden="true">🗂️</span>
-          <h2 className="db-agenda-title">{campaignName}</h2>
+    <section className="hn-agenda">
+      <header className="hn-agenda-head">
+        <div className="hn-agenda-titlewrap">
+          <span className="hn-agenda-icon" aria-hidden="true"><CalendarIcon /></span>
+          {canSwitch ? (
+            <button type="button" className="hn-agenda-title hn-agenda-title-btn" onClick={onSwitch} title="Switch campaign">
+              {campaignName}
+              <span className="hn-caret" aria-hidden="true">▾</span>
+            </button>
+          ) : (
+            <h2 className="hn-agenda-title">{campaignName}</h2>
+          )}
         </div>
         {canSwitch ? (
-          <button type="button" className="db-agenda-switch" onClick={onSwitch}>
-            Switch <span className="db-caret" aria-hidden="true">▾</span>
-          </button>
+          <div className="hn-agenda-nav">
+            <button type="button" className="hn-arrow" onClick={onPrev} aria-label="Previous campaign">←</button>
+            <button type="button" className="hn-arrow" onClick={onNext} aria-label="Next campaign">→</button>
+          </div>
         ) : null}
       </header>
 
-      <div className="db-agenda-tabs" role="list" aria-label="Content status counts">
-        {STATUS_TABS.map((t) => (
-          <span key={t.key} className={'db-tab tone-' + t.tone} role="listitem">
-            <span className="db-tab-label">{t.label}</span>
-            <span className="db-tab-count">{t.pick(counts)}</span>
+      <div className="hn-tabs" role="list" aria-label="Content status counts">
+        {STATUS_TABS.map((t, i) => (
+          <span key={t.key} className={'hn-tab' + (i === 0 ? ' is-active' : '')} role="listitem">
+            {t.label}
+            <span className="hn-tab-count">{t.pick(counts)}</span>
           </span>
         ))}
       </div>
 
       {hasRows ? (
-        <ul className="db-agenda-list">
-          {sorted.map((row) => (
-            <li key={row.id} className="db-agenda-row">
-              <div className="db-agenda-date">
-                <span className="db-agenda-date-main">{fmtDate(row.date) || row.date}</span>
-                <span className="db-agenda-date-day">{row.day}</span>
-              </div>
-              <div className="db-agenda-body">
-                <div className="db-agenda-body-top">
-                  {row.pillar ? <span className="db-pillar-chip">{row.pillar}</span> : null}
-                  <span className="db-agenda-topic">{row.topicTitle || 'Untitled content'}</span>
+        <ul className="hn-list">
+          {sorted.map((row) => {
+            const tone = getContentStatusTone(row.productionStatus);
+            return (
+              <li key={row.id} className="hn-row">
+                <div className="hn-row-date">
+                  <span className="hn-row-date-main">{fmtDate(row.date) || row.date}</span>
+                  <span className="hn-row-date-day">{row.day}</span>
                 </div>
-                {row.hook ? <p className="db-agenda-hook">{row.hook}</p> : null}
-              </div>
-              <span
-                className={'status-badge status-badge-' + getContentStatusTone(row.productionStatus)}
-              >
-                {getContentStatusLabel(row.productionStatus)}
-              </span>
-            </li>
-          ))}
+                <div className="hn-row-body">
+                  {row.pillar ? <span className="hn-row-pillar">{row.pillar}</span> : null}
+                  <span className="hn-row-title">{row.topicTitle || 'Untitled content'}</span>
+                  {row.hook ? <p className="hn-row-hook">{row.hook}</p> : null}
+                </div>
+                <span className={'hn-row-status tone-' + tone} title={getContentStatusLabel(row.productionStatus)}>
+                  <span className="hn-row-status-dot" aria-hidden="true" />
+                  <span className="hn-row-status-label">{getContentStatusLabel(row.productionStatus)}</span>
+                </span>
+              </li>
+            );
+          })}
         </ul>
       ) : (
-        <div className="db-agenda-empty">
-          <p className="db-agenda-empty-title">No campaign content yet</p>
-          <p className="db-agenda-empty-text">
-            Create a content plan to see your campaign agenda here.
-          </p>
-          <Link className="db-link" href="/content-calendar">
-            Create content plan &rarr;
-          </Link>
+        <div className="hn-empty">
+          <p className="hn-empty-title">No campaign content yet</p>
+          <p className="hn-empty-text">Create a content plan to see your campaign agenda here.</p>
+          <Link className="hn-link" href="/content-calendar">Create content plan &rarr;</Link>
         </div>
       )}
 
-      <footer className="db-agenda-foot">
-        <Link className="db-link" href={viewAllHref}>
-          View all &rarr;
-        </Link>
+      <footer className="hn-foot">
+        <Link className="hn-link" href={viewAllHref}>View all &rarr;</Link>
       </footer>
     </section>
   );

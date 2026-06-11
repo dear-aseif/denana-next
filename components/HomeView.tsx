@@ -94,33 +94,51 @@ export default function HomeView() {
     if (typeof window !== 'undefined') window.scrollTo(0, 0);
   }
 
+  // Prev/next campaign navigation for the agenda header. Cycles the active
+  // campaign through the existing campaign list using the same switch logic
+  // (reuses switchCampaign — no new date-navigation logic, no migrations).
+  const activeIdx = campaigns.findIndex((c) => c.id === activeId);
+  function cycleCampaign(delta: number) {
+    if (campaigns.length < 2) return;
+    const base = activeIdx < 0 ? 0 : activeIdx;
+    const i = (base + delta + campaigns.length) % campaigns.length;
+    switchCampaign(campaigns[i].id);
+  }
+
   return (
     <>
-      <div className="dash16b">
+      <div className="home-neutral">
         {/* ---- 1. Header / greeting (no eyebrow; left-aligned with grid) ---- */}
         <PageHeader
           title={brand ? `Welcome, ${brand.businessName} 👋` : 'Welcome 👋'}
           subtitle="See your active campaign, content progress, and today's work in one place."
         />
 
-        {/* ---- 2. Two-column command layout (reference: Home.png) ---- */}
-        <div className="db-grid">
+        {/* ---- 2. Two-column command layout (reference: Figma Home.png) ---- */}
+        <div className="hn-grid">
           {/* Left: dominant Campaign Agenda */}
-          <div className="db-col-left">
+          <div className="hn-left">
             <CampaignAgendaCard
               campaign={campaign}
               rows={calendar}
               counts={counts}
               canSwitch={campaigns.length > 1}
               onSwitch={() => setSwitcherOpen(true)}
+              onPrev={() => cycleCampaign(-1)}
+              onNext={() => cycleCampaign(1)}
             />
           </div>
 
           {/* Right rail: Progress Content + Today's Work */}
-          <div className="db-col-right">
-            <Card className="db-rail-card db-progress-card">
-              <div className="db-card-head">
-                <span className="db-card-title">📊 Progress Content</span>
+          <div className="hn-rail">
+            <Card className="hn-card hn-progress-card">
+              <div className="hn-card-head">
+                <span className="hn-card-title">
+                  <svg className="hn-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 20V10M10 20V4M16 20v-7M2 20h20" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Progress Content
+                </span>
               </div>
               <DashboardStatGrid total={counts.total} campaignCount={campaigns.length} stats={statItems} />
             </Card>

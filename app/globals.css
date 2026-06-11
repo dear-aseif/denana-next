@@ -1730,449 +1730,493 @@ table.cal td .sched-chip{margin-top:0;}
 .wc-empty-card .empty p { font-size: 13px; margin: 4px auto 14px; }
 
 /* ============================================================
-   Phase 16J-Rev1B — Dashboard Visual Realignment (scoped)
-   Reference: Home.png. All rules are scoped under .dash16b so they
-   never leak into Work Calendar, Content Planner, Detail Modal, or
-   the Create Campaign Wizard. No global selectors (.btn / .card /
-   .empty / .status-badge / .page-head) are redefined here.
-   ============================================================ */
-.dash16b {
-  --db-radius: 12px;
-  --db-border: 1px solid var(--notion-border-soft, rgba(180, 150, 80, 0.14));
-  --db-divider: 1px solid var(--notion-border-soft, rgba(180, 150, 80, 0.10));
-  --db-shadow: 0 1px 2px rgba(30, 25, 15, 0.04);
-  --db-gap: 22px;
-  --db-ink: #2b2823;
-}
 
-.dash16b .page-head {
+/* ============================================================
+   Phase 16J-Rev2 — Homepage Neutral UI (scoped: .home-neutral)
+   Neutral SaaS / productivity styling modeled on the Figma Home.png
+   reference. All rules are scoped under .home-neutral so they never
+   leak into Work Calendar, Content Planner, Detail Modal, or the
+   Create Campaign Wizard. No global selectors (.btn / .card / .empty /
+   .status-badge / .page-head) or color tokens are redefined here —
+   the gold theme is simply not referenced on the Homepage.
+   ============================================================ */
+.home-neutral {
+  --hn-border: 1px solid #e7e4dd;
+  --hn-divider: 1px solid #eeece6;
+  --hn-radius: 12px;
+  --hn-shadow: 0 1px 2px rgba(20, 18, 12, 0.04);
+  --hn-gap: 22px;
+  --hn-ink: #1d1d1b;
+  --hn-muted: #6f6d66;
+  --hn-faint: #9b988f;
+  --hn-surface: #ffffff;
+  --hn-soft: #f7f5f0;
+}
+.home-neutral .page-head {
   margin-bottom: 18px;
 }
+.home-neutral .hn-ic {
+  display: inline-block;
+  vertical-align: -3px;
+  color: var(--hn-muted);
+  flex: none;
+}
 
-/* ---- Two-column command grid ---- */
-.dash16b .db-grid {
+/* ---- Two-column grid ---- */
+.home-neutral .hn-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
-  gap: var(--db-gap);
+  grid-template-columns: minmax(0, 1.78fr) minmax(0, 1fr);
+  gap: var(--hn-gap);
   align-items: start;
 }
-.dash16b .db-col-right {
+.home-neutral .hn-rail {
   display: flex;
   flex-direction: column;
-  gap: var(--db-gap);
+  gap: var(--hn-gap);
 }
 
-/* ---- Shared dashboard card chrome ---- */
-.dash16b .db-agenda,
-.dash16b .db-rail-card {
-  background: var(--notion-surface, #fff);
-  border: var(--db-border);
-  border-radius: var(--db-radius);
-  box-shadow: var(--db-shadow);
+/* ---- Shared card chrome ---- */
+.home-neutral .hn-agenda,
+.home-neutral .hn-card {
+  background: var(--hn-surface);
+  border: var(--hn-border);
+  border-radius: var(--hn-radius);
+  box-shadow: var(--hn-shadow);
 }
-.dash16b .db-rail-card {
+.home-neutral .hn-card {
   padding: 16px 16px 14px;
 }
 
 /* ============ A. Campaign Agenda (dominant left) ============ */
-.dash16b .db-agenda {
+.home-neutral .hn-agenda {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
-.dash16b .db-agenda-head {
+.home-neutral .hn-agenda-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 18px 12px;
-  border-bottom: var(--db-border);
+  padding: 14px 18px;
+  border-bottom: var(--hn-border);
 }
-.dash16b .db-agenda-titlewrap {
+.home-neutral .hn-agenda-titlewrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   min-width: 0;
 }
-.dash16b .db-agenda-icon {
-  font-size: 18px;
-  line-height: 1;
+.home-neutral .hn-agenda-icon {
+  display: inline-flex;
+  color: var(--hn-muted);
 }
-.dash16b .db-agenda-title {
+.home-neutral .hn-agenda-title {
   margin: 0;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 650;
-  line-height: 1.25;
-  color: var(--db-ink);
+  color: var(--hn-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dash16b .db-agenda-switch {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border: var(--db-border);
-  background: var(--notion-bg-soft, #faf7f1);
-  color: var(--notion-text-soft, #7a7468);
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.dash16b .db-agenda-switch:hover {
-  background: #fff;
-  color: var(--db-ink);
-}
-.dash16b .db-caret {
-  font-size: 10px;
-}
-
-/* status tabs (display-only counts) */
-.dash16b .db-agenda-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  padding: 12px 18px;
-  border-bottom: var(--db-border);
-}
-.dash16b .db-tab {
+.home-neutral .hn-agenda-title-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  max-width: 100%;
+}
+.home-neutral .hn-agenda-title-btn:hover {
+  color: #000;
+}
+.home-neutral .hn-caret {
+  font-size: 11px;
+  color: var(--hn-faint);
+  flex: none;
+}
+.home-neutral .hn-agenda-nav {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+.home-neutral .hn-arrow {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--hn-border);
+  background: var(--hn-surface);
+  border-radius: 8px;
+  color: var(--hn-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.home-neutral .hn-arrow:hover {
+  background: var(--hn-soft);
+  color: var(--hn-ink);
+}
+
+/* status tabs (display-only) */
+.home-neutral .hn-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 11px 18px;
+  border-bottom: var(--hn-border);
+}
+.home-neutral .hn-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
   font-weight: 600;
-  color: var(--notion-text-soft, #7a7468);
-  background: var(--notion-bg-soft, #faf7f1);
-  border-radius: 999px;
-  padding: 4px 10px;
+  color: var(--hn-muted);
+  padding-bottom: 3px;
+  border-bottom: 2px solid transparent;
 }
-.dash16b .db-tab::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #b9b3a6;
+.home-neutral .hn-tab.is-active {
+  color: var(--hn-ink);
+  border-bottom-color: var(--hn-ink);
 }
-.dash16b .db-tab.tone-planning::before { background: #8b94a3; }
-.dash16b .db-tab.tone-scheduled::before { background: #2f6db0; }
-.dash16b .db-tab.tone-production::before { background: #c79a2a; }
-.dash16b .db-tab.tone-ready::before { background: #8a5cc4; }
-.dash16b .db-tab.tone-posted::before { background: #3c7a45; }
-.dash16b .db-tab-count {
+.home-neutral .hn-tab-count {
+  font-size: 11px;
   font-weight: 700;
-  color: var(--db-ink);
+  color: var(--hn-faint);
+  background: var(--hn-soft);
+  border-radius: 999px;
+  padding: 1px 7px;
   font-variant-numeric: tabular-nums;
+}
+.home-neutral .hn-tab.is-active .hn-tab-count {
+  color: var(--hn-ink);
 }
 
 /* agenda list */
-.dash16b .db-agenda-list {
+.home-neutral .hn-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 560px;
+  max-height: 520px;
   overflow-y: auto;
 }
-.dash16b .db-agenda-row {
+.home-neutral .hn-row {
   display: grid;
-  grid-template-columns: 78px 1fr auto;
-  gap: 12px;
+  grid-template-columns: 92px 1fr auto;
+  gap: 14px;
   align-items: start;
-  padding: 12px 18px;
-  border-bottom: var(--db-divider);
+  padding: 13px 18px;
+  border-bottom: var(--hn-divider);
 }
-.dash16b .db-agenda-row:last-child {
+.home-neutral .hn-row:last-child {
   border-bottom: none;
 }
-.dash16b .db-agenda-date {
+.home-neutral .hn-row-date {
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
+  line-height: 1.25;
 }
-.dash16b .db-agenda-date-main {
-  font-size: 12.5px;
+.home-neutral .hn-row-date-main {
+  font-size: 13px;
   font-weight: 650;
-  color: var(--db-ink);
+  color: var(--hn-ink);
 }
-.dash16b .db-agenda-date-day {
+.home-neutral .hn-row-date-day {
   font-size: 11.5px;
-  color: var(--notion-text-faint, #b3ac9e);
+  color: var(--hn-faint);
 }
-.dash16b .db-agenda-body {
+.home-neutral .hn-row-body {
   min-width: 0;
+  padding-left: 14px;
+  border-left: var(--hn-divider);
 }
-.dash16b .db-agenda-body-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+.home-neutral .hn-row-pillar {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hn-faint);
+  margin-bottom: 2px;
 }
-.dash16b .db-agenda-topic {
+.home-neutral .hn-row-title {
+  display: block;
   font-size: 13.5px;
   font-weight: 550;
-  color: var(--db-ink);
+  color: var(--hn-ink);
 }
-.dash16b .db-agenda-hook {
+.home-neutral .hn-row-hook {
   margin: 3px 0 0;
   font-size: 12px;
-  color: var(--notion-text-soft, #7a7468);
+  color: var(--hn-muted);
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.dash16b .db-pillar-chip {
+.home-neutral .hn-row-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   flex: none;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gold-deep, #a8841f);
-  background: var(--gold-bg, #fbf6ea);
-  border-radius: 6px;
-  padding: 2px 7px;
 }
-.dash16b .db-agenda-empty {
+.home-neutral .hn-row-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b9b3a6;
+  flex: none;
+}
+.home-neutral .hn-row-status-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--hn-muted);
+  white-space: nowrap;
+}
+.home-neutral .hn-row-status.tone-planning .hn-row-status-dot { background: #8b94a3; }
+.home-neutral .hn-row-status.tone-scheduled .hn-row-status-dot { background: #2f6db0; }
+.home-neutral .hn-row-status.tone-production .hn-row-status-dot { background: #c08a2e; }
+.home-neutral .hn-row-status.tone-ready .hn-row-status-dot { background: #8a5cc4; }
+.home-neutral .hn-row-status.tone-posted .hn-row-status-dot { background: #3c7a45; }
+
+.home-neutral .hn-empty {
   padding: 30px 18px;
   text-align: center;
 }
-.dash16b .db-agenda-empty-title {
+.home-neutral .hn-empty-title {
   margin: 0;
   font-size: 14px;
   font-weight: 650;
-  color: var(--db-ink);
+  color: var(--hn-ink);
 }
-.dash16b .db-agenda-empty-text {
+.home-neutral .hn-empty-text {
   margin: 4px 0 10px;
   font-size: 12.5px;
-  color: var(--notion-text-soft, #7a7468);
+  color: var(--hn-muted);
 }
-.dash16b .db-agenda-foot {
+.home-neutral .hn-foot {
   padding: 12px 18px;
-  border-top: var(--db-border);
+  border-top: var(--hn-border);
+  text-align: center;
 }
-.dash16b .db-link {
+.home-neutral .hn-link {
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--gold-deep, #a8841f);
+  color: var(--hn-ink);
   text-decoration: none;
 }
-.dash16b .db-link:hover {
+.home-neutral .hn-link:hover {
   text-decoration: underline;
 }
 
 /* ============ B. Progress Content (stat tiles) ============ */
-.dash16b .db-card-head {
+.home-neutral .hn-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
-.dash16b .db-card-headtext {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.dash16b .db-card-title {
+.home-neutral .hn-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-size: 14px;
   font-weight: 650;
-  color: var(--db-ink);
+  color: var(--hn-ink);
 }
-.dash16b .db-card-sub {
-  font-size: 11.5px;
-  color: var(--notion-text-faint, #b3ac9e);
-}
-.dash16b .db-progress {
+.home-neutral .hn-progress {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
-.dash16b .db-hero-row {
+.home-neutral .hn-hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
-.dash16b .db-hero-tile {
+.home-neutral .hn-hero-tile {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 12px 14px;
+  gap: 4px;
+  padding: 14px;
+  border: var(--hn-border);
   border-radius: 10px;
-  background: var(--notion-bg-soft, #faf7f1);
-  border: var(--db-border);
+  background: var(--hn-surface);
 }
-.dash16b .db-hero-num {
-  font-size: 26px;
+.home-neutral .hn-hero-num {
+  font-size: 28px;
   font-weight: 700;
   line-height: 1;
-  color: var(--db-ink);
+  color: var(--hn-ink);
+  font-variant-numeric: tabular-nums;
 }
-.dash16b .db-hero-label {
+.home-neutral .hn-hero-label {
   font-size: 11.5px;
-  color: var(--notion-text-soft, #7a7468);
+  color: var(--hn-muted);
 }
-.dash16b .db-stat-grid {
+.home-neutral .hn-stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
-.dash16b .db-stat-grid .db-stat-tile:nth-child(5) {
+.home-neutral .hn-stats .hn-stat:nth-child(5) {
   grid-column: 1 / -1;
 }
-.dash16b .db-stat-tile {
+.home-neutral .hn-stat {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 9px 11px;
+  gap: 4px;
+  padding: 10px 11px;
+  border: var(--hn-divider);
   border-radius: 9px;
-  border: var(--db-divider);
-  background: #fff;
+  background: var(--hn-surface);
 }
-.dash16b .db-stat-num {
-  font-size: 17px;
+.home-neutral .hn-stat-num {
+  font-size: 18px;
   font-weight: 700;
   line-height: 1;
-  color: var(--db-ink);
+  color: var(--hn-ink);
+  font-variant-numeric: tabular-nums;
 }
-.dash16b .db-stat-label {
+.home-neutral .hn-stat-label {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--notion-text-soft, #7a7468);
+  color: var(--hn-muted);
 }
-.dash16b .db-stat-label::before {
+.home-neutral .hn-stat-label::before {
   content: "";
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: #b9b3a6;
+  flex: none;
 }
-.dash16b .db-stat-tile.tone-planning .db-stat-label::before { background: #8b94a3; }
-.dash16b .db-stat-tile.tone-scheduled .db-stat-label::before { background: #2f6db0; }
-.dash16b .db-stat-tile.tone-production .db-stat-label::before { background: #c79a2a; }
-.dash16b .db-stat-tile.tone-ready .db-stat-label::before { background: #8a5cc4; }
-.dash16b .db-stat-tile.tone-posted .db-stat-label::before { background: #3c7a45; }
+.home-neutral .hn-stat.tone-planning .hn-stat-label::before { background: #8b94a3; }
+.home-neutral .hn-stat.tone-scheduled .hn-stat-label::before { background: #2f6db0; }
+.home-neutral .hn-stat.tone-production .hn-stat-label::before { background: #c08a2e; }
+.home-neutral .hn-stat.tone-ready .hn-stat-label::before { background: #8a5cc4; }
+.home-neutral .hn-stat.tone-posted .hn-stat-label::before { background: #3c7a45; }
 
 /* ============ C. Today's Work (compact rail list) ============ */
-.dash16b .db-wi-list {
+.home-neutral .hn-wi-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.dash16b .db-wi-row {
+.home-neutral .hn-wi-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 0;
-  border-bottom: var(--db-divider);
+  padding: 11px 0;
+  border-bottom: var(--hn-divider);
 }
-.dash16b .db-wi-row:first-child {
-  padding-top: 4px;
+.home-neutral .hn-wi-row:first-child {
+  padding-top: 2px;
 }
-.dash16b .db-wi-row:last-child {
+.home-neutral .hn-wi-row:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
-.dash16b .db-wi-main {
+.home-neutral .hn-wi-main {
   min-width: 0;
 }
-.dash16b .db-wi-title {
-  margin: 0 0 5px;
+.home-neutral .hn-wi-title {
+  margin: 0 0 6px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--db-ink);
+  color: var(--hn-ink);
 }
-.dash16b .db-wi-chips {
+.home-neutral .hn-wi-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
 }
-.dash16b .db-chip {
+.home-neutral .hn-chip {
   font-size: 10.5px;
   font-weight: 600;
-  color: var(--notion-text-soft, #7a7468);
-  background: var(--notion-bg-soft, #faf7f1);
+  color: var(--hn-muted);
+  background: var(--hn-soft);
   border-radius: 5px;
-  padding: 2px 6px;
+  padding: 2px 7px;
 }
-.dash16b .db-chip-pillar {
-  color: var(--gold-deep, #a8841f);
-  background: var(--gold-bg, #fbf6ea);
-}
-.dash16b .db-wi-status {
+.home-neutral .hn-wi-side {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
-.dash16b .db-wi-chevron {
-  font-size: 15px;
-  color: var(--notion-text-faint, #b3ac9e);
+.home-neutral .hn-wi-chevron {
+  font-size: 16px;
+  color: var(--hn-faint);
 }
-.dash16b .db-today-empty {
-  padding: 12px 2px 4px;
+.home-neutral .hn-today-empty {
+  padding: 10px 2px 2px;
 }
-.dash16b .db-today-empty-title {
+.home-neutral .hn-today-empty-title {
   margin: 0;
   font-size: 13px;
   font-weight: 650;
-  color: var(--db-ink);
+  color: var(--hn-ink);
 }
-.dash16b .db-today-empty-text {
+.home-neutral .hn-today-empty-text {
   margin: 4px 0 10px;
   font-size: 12px;
-  color: var(--notion-text-soft, #7a7468);
+  color: var(--hn-muted);
 }
 
-/* ============ Dashboard-scoped CTA styling ============ */
-/* Scoped to .dash16b ONLY — does not change the global .btn rule. */
-.dash16b .btn {
-  background: #1f1d1a;
-  border-color: #1f1d1a;
+/* ============ Homepage-scoped CTA (neutral, no gold) ============ */
+/* Scoped to .home-neutral ONLY — does not touch the global .btn rule. */
+.home-neutral .btn {
+  background: #1c1b19;
+  border-color: #1c1b19;
   color: #fff;
   box-shadow: none;
 }
-.dash16b .btn:hover {
+.home-neutral .btn:hover {
   background: #000;
   border-color: #000;
 }
-.dash16b .btn.secondary {
+.home-neutral .btn.secondary {
   background: transparent;
   border-color: transparent;
-  color: var(--gold-deep, #a8841f);
+  color: var(--hn-ink);
   padding-left: 4px;
   padding-right: 4px;
   box-shadow: none;
 }
-.dash16b .btn.secondary:hover {
+.home-neutral .btn.secondary:hover {
   background: transparent;
   text-decoration: underline;
 }
 
 /* ============ Responsive ============ */
 @media (max-width: 900px) {
-  .dash16b .db-grid {
+  .home-neutral .hn-grid {
     grid-template-columns: 1fr;
   }
 }
 @media (max-width: 480px) {
-  .dash16b .db-hero-row {
+  .home-neutral .hn-hero {
     grid-template-columns: 1fr;
   }
-  .dash16b .db-stat-grid {
+  .home-neutral .hn-stats {
     grid-template-columns: 1fr;
   }
-  .dash16b .db-stat-grid .db-stat-tile:nth-child(5) {
+  .home-neutral .hn-stats .hn-stat:nth-child(5) {
     grid-column: auto;
   }
-  .dash16b .db-agenda-row {
-    grid-template-columns: 66px 1fr;
+  .home-neutral .hn-row {
+    grid-template-columns: 78px 1fr;
   }
-  .dash16b .db-agenda-row .status-badge {
+  .home-neutral .hn-row-status {
     grid-column: 2;
     justify-self: start;
     margin-top: 4px;
